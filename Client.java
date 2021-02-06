@@ -48,7 +48,6 @@ public class Client implements Runnable {
 		}  catch (UnknownHostException e) {
 			System.out.println("Server is not available on " + HOST_NAME);
 		} catch (ConnectException e) {
-			System.out.println(e);
 			System.out.println("No Server running on Port " + PORT);
 		} catch (SocketException e) {
 			System.out.println("Server is closed.");

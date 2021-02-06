@@ -85,7 +85,7 @@ public class Server implements Runnable {
 		} catch (BindException e) {
 			System.out.println("Port is already inuse. Please choose another.");
 		} catch (Exception e) {
-			System.out.println(e);
+			System.out.println("Something is wrong.");
 		}
 	}
 }
