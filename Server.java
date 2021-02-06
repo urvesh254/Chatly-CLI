@@ -2,9 +2,9 @@ import java.net.*;
 import java.io.*;
 import java.util.*;
 
-public class Server  implements Runnable {
-	private static final int PORT = 3334;
+public class Server implements Runnable {
 	private static ArrayList<Socket> clients = new ArrayList<>();
+	private static int PORT = 3334;
 	private static String HOST_NAME;
 	private static String HOST_ADDRESS;
 	private Thread t;
@@ -18,7 +18,7 @@ public class Server  implements Runnable {
 	}
 
 	public void run() {
-		try(BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 			clients.add(socket);
 
 			clientName = reader.readLine();
@@ -64,8 +64,13 @@ public class Server  implements Runnable {
 
 	public static void main(String arg[]) {
 		try {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
 			HOST_NAME = InetAddress.getLocalHost().getHostName();
 			HOST_ADDRESS = InetAddress.getLocalHost().getHostAddress();
+
+			System.out.print("Port For Server : ");
+			PORT = Integer.parseInt(reader.readLine());
 
 			ServerSocket ss = new ServerSocket(PORT);
 			System.out.println("Server HOST NAME : " + HOST_NAME);
