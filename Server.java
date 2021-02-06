@@ -1,6 +1,6 @@
 import java.net.*;
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
 
 public class Server implements Runnable {
 	private static ArrayList<Socket> clients = new ArrayList<>();
@@ -73,9 +73,9 @@ public class Server implements Runnable {
 			PORT = Integer.parseInt(reader.readLine());
 
 			ServerSocket ss = new ServerSocket(PORT);
-			System.out.println("Server HOST NAME : " + HOST_NAME);
-			System.out.println("Server HOST ADDRESS : " + HOST_ADDRESS);
-			System.out.println("Server is started on Port No.: " + PORT);
+			System.out.println(String.format("\nServer HOST NAME : %s" , HOST_NAME));
+			System.out.println(String.format("Server HOST ADDRESS : %s" , HOST_ADDRESS));
+			System.out.println(String.format("Server is started on Port No.: %d\n" , PORT));
 
 			while (true) {
 				Socket socket = ss.accept();

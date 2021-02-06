@@ -30,6 +30,8 @@ public class Client implements Runnable {
 			writer.println(clientName);
 			writer.println(InetAddress.getLocalHost());
 
+			System.out.println(String.format("\nYou are connected with %s\n", HOST_NAME));
+
 			String message;
 			do {
 				message = clientInfo.readLine();
