@@ -3,8 +3,8 @@ import java.io.*;
 
 public class Client implements Runnable {
 
-	private static int PORT = 3334;
-	private static String HOST_NAME = "UKPatel";
+	private static int PORT;
+	private static String HOST_NAME;
 
 	private String clientName;
 	private Thread t;

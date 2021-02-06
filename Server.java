@@ -18,8 +18,8 @@ public class Server implements Runnable {
 	}
 
 	public void run() {
+		clients.add(socket);
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
-			clients.add(socket);
 
 			clientName = reader.readLine();
 			sendOtherClients(clientName + " is connected.");
