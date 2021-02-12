@@ -63,7 +63,7 @@
 2.  Run the `Server.java` file. It ask the port number for running the server. After getting the input server run on this port number and show the host/IP address of the Server which help to Client to connect to the server.
 	![Running Server](https://user-images.githubusercontent.com/55116730/107730891-94535a80-6d1a-11eb-877f-c49a20c83129.png "Running Server")
 3. After running the server you can add multiple client to the server.
-	![Chaltly-CLI](https://user-images.githubusercontent.com/55116730/107732358-290b8780-6d1e-11eb-8655-b5a6e17f9ce4.gif "Chaltly-CLI")
+	[![Chaltly-CLI](https://user-images.githubusercontent.com/55116730/107732358-290b8780-6d1e-11eb-8655-b5a6e17f9ce4.gif "Chaltly-CLI")](https://youtu.be/US6uyZ7aXIU)
 
 
 <h4 align="center"> Show some  ❤️  by starring this repository.</h4>
