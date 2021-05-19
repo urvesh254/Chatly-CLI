@@ -62,7 +62,7 @@ public class Client implements Runnable {
 	private void getClientInfo() throws IOException {
 		System.out.print("Name : ");
 		clientName = clientInfo.readLine();
-		System.out.print("Server Host Name / IPV4 Address : ");
+		System.out.print("Server IPV4 Address : ");
 		HOST_NAME = clientInfo.readLine();
 		System.out.print("Port  : ");
 		PORT = Integer.parseInt(clientInfo.readLine());

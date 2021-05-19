@@ -22,8 +22,8 @@ public class Server implements Runnable {
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
 			clientName = reader.readLine();
-			sendOtherClients(clientName + " is connected.");
-			System.out.println(clientName + " at " + reader.readLine() + " is connected.");
+			sendOtherClients(clientName + " is join the chat.");
+			System.out.println(clientName + " at " + reader.readLine() + " is join the chat.");
 
 			String message;
 			while (true) {
@@ -37,8 +37,9 @@ public class Server implements Runnable {
 			}
 
 		} catch (Exception e) {
-			System.out.println(clientName + " leave the chat.");
-			sendOtherClients(clientName + " leave the chat.");
+			// System.out.println(e.toString());
+			System.out.println(clientName + " left the chat.");
+			sendOtherClients(clientName + " left the chat.");
 		}
 		clients.remove(socket);
 	}
