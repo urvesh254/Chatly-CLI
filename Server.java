@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Server implements Runnable {
 	private static ArrayList<Socket> clients = new ArrayList<>();
-	private static int PORT = 3334;
+	private static int PORT;
 	private static String HOST_NAME;
 	private static String HOST_ADDRESS;
 	private Thread t;
@@ -70,8 +70,12 @@ public class Server implements Runnable {
 			HOST_NAME = InetAddress.getLocalHost().getHostName();
 			HOST_ADDRESS = InetAddress.getLocalHost().getHostAddress();
 
-			System.out.print("Port For Server : ");
-			PORT = Integer.parseInt(reader.readLine());
+			System.out.print("Port For Server (Default 3333) : ");
+			try {
+				PORT = Integer.parseInt(reader.readLine());
+			} catch (NumberFormatException e) {
+				PORT = 3333;
+			}
 
 			ServerSocket ss = new ServerSocket(PORT);
 			System.out.println(String.format("\nServer HOST NAME : %s" , HOST_NAME));
