@@ -24,11 +24,11 @@ public class Client implements Runnable {
 			// socket = new Socket(ipAddress, PORT);
 			socket = new Socket(HOST_NAME, PORT);
 			t.start();
-			PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
+			DataOutputStream writer = new DataOutputStream(socket.getOutputStream());
 
 			// Sending Information of the client.
-			writer.println(clientName);
-			writer.println(InetAddress.getLocalHost());
+			writer.writeUTF(clientName);
+			writer.writeUTF(InetAddress.getLocalHost().toString());
 
 			System.out.println(String.format("\nYou are connected with %s\n", HOST_NAME));
 
@@ -37,7 +37,7 @@ public class Client implements Runnable {
 				message = clientInfo.readLine();
 				if (message.isEmpty())
 					continue;
-				writer.println(message);
+				writer.writeUTF(message);
 			} while (!message.toLowerCase().equals("exit"));
 			writer.close();
 			if (t.isAlive()) {
@@ -69,11 +69,11 @@ public class Client implements Runnable {
 	}
 
 	public void run() {
-		try(BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+		try(DataInputStream reader = new DataInputStream(socket.getInputStream())) {
 
 			String message;
 			while (true) {
-				message = reader.readLine();
+				message = reader.readUTF();
 				System.out.println(message);
 			}
 		} catch (SocketException e) {

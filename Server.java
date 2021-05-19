@@ -13,21 +13,21 @@ public class Server implements Runnable {
 
 	public Server(Socket socket) {
 		this.socket = socket;
-		t = new Thread(this, "Accept");
+		t = new Thread(this);
 		t.start();
 	}
 
 	public void run() {
 		clients.add(socket);
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+		try (DataInputStream reader = new DataInputStream(socket.getInputStream())) {
 
-			clientName = reader.readLine();
+			clientName = reader.readUTF();
 			sendOtherClients(clientName + " is join the chat.");
-			System.out.println(clientName + " at " + reader.readLine() + " is join the chat.");
+			System.out.println(clientName + " at " + reader.readUTF() + " is join the chat.");
 
 			String message;
 			while (true) {
-				message = reader.readLine();
+				message = reader.readUTF();
 				if (message.toLowerCase().equals("exit")) {
 					throw new Exception();
 				} else {
@@ -46,14 +46,14 @@ public class Server implements Runnable {
 
 	private void sendOtherClients(String message) {
 		try {
-			PrintWriter writer;
+			DataOutputStream writer;
 			for (Socket client : clients) {
 				if (client == socket) {
 					continue;
 				}
 				try {
-					writer = new PrintWriter(client.getOutputStream(), true);
-					writer.println(message);
+					writer = new DataOutputStream(client.getOutputStream());
+					writer.writeUTF(message);
 				} catch (SocketException e) {
 				}
 			}
