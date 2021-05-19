@@ -41,7 +41,7 @@ public class Client implements Runnable {
 			} while (!message.toLowerCase().equals("exit"));
 			writer.close();
 			if (t.isAlive()) {
-				t.stop();
+				t.interrupt();
 			}
 			socket.close();
 			clientInfo.close();
