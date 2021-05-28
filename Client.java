@@ -1,5 +1,6 @@
 import java.net.*;
 import java.io.*;
+import com.ukpatel.chatly.Message;
 
 public class Client implements Runnable {
 

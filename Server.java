@@ -1,6 +1,7 @@
 import java.net.*;
 import java.io.*;
 import java.util.ArrayList;
+import com.ukpatel.chatly.Message;
 
 public class Server implements Runnable {
 	private static ArrayList<ObjectOutputStream> clientsOutputStreams = new ArrayList<>();
@@ -20,7 +21,6 @@ public class Server implements Runnable {
 			this.writer = new ObjectOutputStream(socket.getOutputStream());
 			this.reader = new ObjectInputStream(socket.getInputStream());
 		} catch (IOException e) {
-			e.printStackTrace();
 		}
 
 		readerThread.start();
