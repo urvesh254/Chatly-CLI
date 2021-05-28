@@ -92,7 +92,6 @@ public class Client implements Runnable {
 			System.out.println("Server is closed.");
 			System.exit(0);
 		} catch (Exception e) {
-			// System.out.println(e);
 		}
 		System.exit(0);
 	}
@@ -101,7 +100,6 @@ public class Client implements Runnable {
 		try {
 			new Client();
 		} catch (Exception e) {
-			System.out.println(e);
 		}
 	}
 }

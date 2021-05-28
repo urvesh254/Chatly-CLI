@@ -51,7 +51,6 @@ public class Server implements Runnable {
 			}
 
 		} catch (Exception e) {
-			// System.out.println(e.toString());
 			System.out.println(clientName + " left the chat.");
 			sendOtherClients(new Message(clientName, Message.USER_EXIT, clientName + " left the chat."));
 		} finally {
