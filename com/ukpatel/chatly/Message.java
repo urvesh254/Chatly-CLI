@@ -1,3 +1,5 @@
+package com.ukpatel.chatly;
+
 import java.io.Serializable;
 
 public class Message implements Serializable {
@@ -31,7 +33,8 @@ public class Message implements Serializable {
         return this.message;
     }
 
+    @Override
     public String toString() {
-        return this.author + " \n" + this.message;
+        return this.author + " : " + this.message;
     }
 }
