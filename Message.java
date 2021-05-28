@@ -30,4 +30,8 @@ public class Message implements Serializable {
     public String getMessage() {
         return this.message;
     }
+
+    public String toString() {
+        return this.author + " \n" + this.message;
+    }
 }

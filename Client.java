@@ -19,14 +19,12 @@ public class Client implements Runnable {
 			// Getting client information
 			getClientInfo();
 
-			// socket = new Socket(ipAddress, PORT);
 			socket = new Socket(HOST_NAME, PORT);
 			readerThread.start();
 			ObjectOutputStream writer = new ObjectOutputStream(socket.getOutputStream());
 
 			// Sending Information of the client.
 			writer.writeObject(new Message(clientName, Message.USER_INFO, InetAddress.getLocalHost().toString()));
-
 			System.out.println(String.format("\nYou are connected with %s\n", HOST_NAME));
 
 			String message;
@@ -41,23 +39,20 @@ public class Client implements Runnable {
 					writer.writeObject(new Message(clientName, Message.MESSAGE, message));
 				}
 			}
-			writer.close();
 			if (readerThread.isAlive()) {
 				readerThread.interrupt();
 			}
 			clientInfo.close();
-		} catch (
-
-		UnknownHostException e) {
-			System.out.println("Server is not available on " + HOST_NAME);
+		} catch (UnknownHostException e) {
+			System.out.println("\nServer is not available on " + HOST_NAME);
 		} catch (ConnectException e) {
-			System.out.println("No Server running on Port " + PORT);
+			System.out.println("\nNo Server running on Port " + PORT);
 		} catch (SocketException e) {
-			System.out.println("Server is closed.");
+			System.out.println("\nServer is closed.");
 		} catch (IOException e) {
-			System.out.println("Input/Output interruption.");
+			System.out.println("\nInput/Output interruption.");
 		} catch (Exception e) {
-			System.out.println("Something is wrong.");
+			System.out.println("\nSomething is wrong.");
 		} finally {
 			try {
 				socket.close();
@@ -97,8 +92,7 @@ public class Client implements Runnable {
 			System.out.println("Server is closed.");
 			System.exit(0);
 		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println(e);
+			// System.out.println(e);
 		}
 		System.exit(0);
 	}

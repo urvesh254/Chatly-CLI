@@ -3,29 +3,37 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class Server implements Runnable {
-	private static ArrayList<Socket> clients = new ArrayList<>();
+	private static ArrayList<ObjectOutputStream> clientsOutputStreams = new ArrayList<>();
+	private static ArrayList<ObjectInputStream> clientsInputStreams = new ArrayList<>();
 	private static int PORT;
 	private static String HOST_NAME;
 	private static String HOST_ADDRESS;
 	private Thread readerThread;
 	private String clientName;
-	private Socket socket;
+	private ObjectOutputStream writer;
+	private ObjectInputStream reader;
 
 	public Server(Socket socket) {
-		this.socket = socket;
 		readerThread = new Thread(this);
+		try {
+			this.writer = new ObjectOutputStream(socket.getOutputStream());
+			this.reader = new ObjectInputStream(socket.getInputStream());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		readerThread.start();
 	}
 
 	public void run() {
-		clients.add(socket);
-		try (ObjectInputStream reader = new ObjectInputStream(socket.getInputStream())) {
+		try {
+			clientsOutputStreams.add(writer);
+			clientsInputStreams.add(reader);
 
 			Message userInfo = (Message) reader.readObject();
 			clientName = userInfo.getAuthor();
 			String ipAddress = userInfo.getMessage();
 
-			// sendOtherClients(clientName + " is join the chat.");
 			sendOtherClients(new Message(clientName, Message.USER_JOIN, clientName + " is join the chat."));
 			System.out.println(clientName + " at " + ipAddress + " is join the chat.");
 
@@ -36,7 +44,8 @@ public class Server implements Runnable {
 					throw new Exception();
 				} else {
 					System.out.println(clientName + " : " + message.getMessage());
-					sendOtherClients(new Message(clientName, Message.MESSAGE, message.getMessage()));
+					sendOtherClients(
+							new Message(clientName, Message.MESSAGE, clientName + " : " + message.getMessage()));
 				}
 			}
 
@@ -44,25 +53,24 @@ public class Server implements Runnable {
 			// System.out.println(e.toString());
 			System.out.println(clientName + " left the chat.");
 			sendOtherClients(new Message(clientName, Message.USER_EXIT, clientName + " left the chat."));
+		} finally {
+			clientsOutputStreams.remove(writer);
+			clientsInputStreams.remove(reader);
 		}
-		clients.remove(socket);
 	}
 
 	private void sendOtherClients(Message message) {
 		try {
-			ObjectOutputStream writer;
-			for (Socket client : clients) {
-				if (client == socket) {
+			for (ObjectOutputStream clientWriter : clientsOutputStreams) {
+				if (clientWriter == writer) {
 					continue;
 				}
 				try {
-					writer = new ObjectOutputStream(client.getOutputStream());
-					writer.writeObject(message);
+					clientWriter.writeObject(message);
 				} catch (SocketException e) {
 				}
 			}
 		} catch (Exception e) {
-			System.out.println(e);
 		}
 
 	}
@@ -78,7 +86,7 @@ public class Server implements Runnable {
 			try {
 				PORT = Integer.parseInt(reader.readLine());
 			} catch (NumberFormatException e) {
-				System.out.println("\nPort No. you enter is invalid.\n Server is started on default port no 3333.");
+				System.out.println("\nPort No. you enter is invalid.\nServer is started on default port no 3333.");
 				PORT = 3333;
 			}
 
