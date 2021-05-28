@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class Server implements Runnable {
 	private static ArrayList<ObjectOutputStream> clientsOutputStreams = new ArrayList<>();
 	private static ArrayList<ObjectInputStream> clientsInputStreams = new ArrayList<>();
+
 	private static int PORT;
 	private static String HOST_NAME;
 	private static String HOST_ADDRESS;
