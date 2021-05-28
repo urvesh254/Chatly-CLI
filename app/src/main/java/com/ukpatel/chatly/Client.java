@@ -1,6 +1,5 @@
 package com.ukpatel.chatly;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
@@ -13,11 +12,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
@@ -27,7 +24,7 @@ import java.net.UnknownHostException;
 public class Client implements Runnable {
 
     private static Client client = null;
-    private static final int connectionTimeout = 3000;
+    private static final int connectionTimeout = 4000;
     private boolean isConnected = false;
     private String HOST_NAME;
     private int PORT;
@@ -36,8 +33,8 @@ public class Client implements Runnable {
 
     private Thread readerThread;
     private Socket socket = null;
-    private DataInputStream receiver;
-    private DataOutputStream sender;
+    private ObjectInputStream receiver;
+    private ObjectOutputStream sender;
     private AppCompatActivity context;
 
     private Client(AppCompatActivity context, String ipAddress, String username, String hostName, int port) {
@@ -52,17 +49,17 @@ public class Client implements Runnable {
             socket = new Socket();
             socket.connect(new InetSocketAddress(HOST_NAME, PORT), connectionTimeout);
             isConnected = true;
-//            receiver = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//            sender = new PrintWriter(socket.getOutputStream(), true);
-            receiver = new DataInputStream(socket.getInputStream());
-            sender = new DataOutputStream(socket.getOutputStream());
+            receiver = new ObjectInputStream(socket.getInputStream());
+            sender = new ObjectOutputStream(socket.getOutputStream());
             showToast("Connected to server.");
 
             readerThread.start();
 
             // Sending Information of the client.
-            sender.writeUTF(clientName);
-            sender.writeUTF(ipAddress);
+//            sender.writeUTF(clientName);
+//            sender.writeUTF(ipAddress);
+            sender.writeObject(new Message(clientName, Message.USER_INFO, ipAddress));
+
         } catch (SocketTimeoutException e) {
             showToast("Please check Host Address and Port.");
             Log.d("socket", "SocketTimeoutException : " + e);
@@ -101,11 +98,10 @@ public class Client implements Runnable {
 
     public void sendMessage(String message) {
         try {
-            Log.d("socket", "output stream down : " + socket.isOutputShutdown());
             if (!socket.isOutputShutdown()) {
                 Log.d("message", message);
 //                sender.println(message);
-                sender.writeUTF(message);
+                sender.writeObject(new Message(clientName, Message.MESSAGE, message));
                 sender.flush();
             } else {
                 throw new Exception("socket is " + socket.isConnected());
@@ -135,11 +131,10 @@ public class Client implements Runnable {
     public void run() {
         try {
             while (true) {
-                String message;
-                message = receiver.readUTF();
-                Log.d("MESSAGE", message);
+                Message message = (Message) receiver.readObject();
+                Log.d("MESSAGE", message.toString());
                 Handler handler = new Handler(Looper.getMainLooper());
-                handler.post(() -> history.append("\n" + message + "\n"));
+                handler.post(() -> history.append("\n" + message.getMessage() + "\n"));
             }
         } catch (SocketException e) {
             Log.d("socket", "In thread " + e.toString());

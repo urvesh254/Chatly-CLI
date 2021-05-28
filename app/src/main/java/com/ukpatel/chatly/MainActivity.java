@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static String USER_NAME = Build.MODEL;
     private static String HOST_ADDRESS = "";
-    private static int PORT = 0;
+    private static int PORT = 54321;
 
     private Button btnConnect;
     private EditText userName, hostName, port;
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             port.setText(String.valueOf(PORT));
 
 //        hostName.setText("192.168.0.125");
-//        port.setText("3333");
+//        port.setText("54321");
         btnConnect.setOnClickListener(this);
     }
 
