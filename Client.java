@@ -68,11 +68,11 @@ public class Client implements Runnable {
 		clientName = clientInfo.readLine();
 		System.out.print("Server IPV4 Address : ");
 		HOST_NAME = clientInfo.readLine();
-		System.out.print("Port (Default 3333): ");
+		System.out.print("Port (Default 54321): ");
 		try {
 			PORT = Integer.parseInt(clientInfo.readLine());
 		} catch (NumberFormatException e) {
-			PORT = 3333;
+			PORT = 54321;
 		}
 
 		if (clientName.isEmpty() || HOST_NAME.isEmpty()) {

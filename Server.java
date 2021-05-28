@@ -82,12 +82,12 @@ public class Server implements Runnable {
 			HOST_NAME = InetAddress.getLocalHost().getHostName();
 			HOST_ADDRESS = InetAddress.getLocalHost().getHostAddress();
 
-			System.out.print("Port For Server (Default 3333) : ");
+			System.out.print("Port For Server (Default 54321) : ");
 			try {
 				PORT = Integer.parseInt(reader.readLine());
 			} catch (NumberFormatException e) {
-				System.out.println("\nPort No. you enter is invalid.\nServer is started on default port no 3333.");
-				PORT = 3333;
+				System.out.println("\nPort No. you enter is invalid.\nServer is started on default port no 54321.");
+				PORT = 54321;
 			}
 
 			ss = new ServerSocket(PORT);
