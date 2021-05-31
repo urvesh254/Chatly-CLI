@@ -14,11 +14,13 @@ public class Message implements Serializable {
     private int messageType;
     private String message;
     private String author;
+    private String time;
 
-    public Message(String author, int messageType, String message) {
+    public Message(String author, int messageType, String message, String time) {
         this.author = author;
         this.messageType = messageType;
         this.message = message;
+        this.time = time;
     }
 
     public String getAuthor() {
@@ -31,6 +33,10 @@ public class Message implements Serializable {
 
     public String getMessage() {
         return this.message;
+    }
+
+    public String getTime() {
+        return this.time;
     }
 
     @Override
