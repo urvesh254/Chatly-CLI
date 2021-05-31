@@ -2,6 +2,8 @@ package com.ukpatel.chatly;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -11,13 +13,19 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.ukpatel.chatly.adapter.MessageAdapter;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public class ChatArea extends AppCompatActivity {
 
     private EditText msg;
-    private TextView history;
+    private MessageAdapter messageAdapter;
     private Button btnSend;
     private Client client;
 
@@ -28,8 +36,12 @@ public class ChatArea extends AppCompatActivity {
 
         msg = findViewById(R.id.msgSend);
         btnSend = findViewById(R.id.btnSend);
-        history = findViewById(R.id.history);
-        history.setMovementMethod(new ScrollingMovementMethod());
+        RecyclerView history = findViewById(R.id.history);
+        messageAdapter = new MessageAdapter(new ArrayList<Message>(), Client.clientName);
+//        history.setMovementMethod(new ScrollingMovementMethod());
+
+        history.setLayoutManager(new LinearLayoutManager(this));
+        history.setAdapter(messageAdapter);
 
         //Check for light or dark mode
         int nightModeFlags =
@@ -47,7 +59,7 @@ public class ChatArea extends AppCompatActivity {
         }
 
         client = Client.getInstance();
-        client.setInfo(this, history);
+        client.setInfo(this, messageAdapter);
 
         btnSend.setOnClickListener(view -> {
             String message = msg.getText().toString().trim();
@@ -55,7 +67,6 @@ public class ChatArea extends AppCompatActivity {
             if (message.isEmpty()) return;
 
             client.sendMessage(message);
-            history.append(String.format("\nYou : %s\n", message));
         });
     }
 

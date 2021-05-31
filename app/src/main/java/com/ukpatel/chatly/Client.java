@@ -10,6 +10,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.ukpatel.chatly.adapter.MessageAdapter;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -20,6 +22,8 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Client implements Runnable {
 
@@ -28,10 +32,9 @@ public class Client implements Runnable {
     private boolean isConnected = false;
     private String HOST_NAME;
     private int PORT;
-    private String clientName;
-    private TextView history;
+    public static String clientName;
+    private MessageAdapter history;
 
-    private Thread readerThread;
     private Socket socket = null;
     private ObjectInputStream receiver;
     private ObjectOutputStream sender;
@@ -39,11 +42,11 @@ public class Client implements Runnable {
 
     private Client(AppCompatActivity context, String ipAddress, String username, String hostName, int port) {
         this.context = context;
-        this.clientName = username;
+        clientName = username;
         this.HOST_NAME = hostName;
         this.PORT = port;
 
-        readerThread = new Thread(this);
+        Thread readerThread = new Thread(this);
 
         try {
             socket = new Socket();
@@ -56,9 +59,7 @@ public class Client implements Runnable {
             readerThread.start();
 
             // Sending Information of the client.
-//            sender.writeUTF(clientName);
-//            sender.writeUTF(ipAddress);
-            sender.writeObject(new Message(clientName, Message.USER_INFO, ipAddress));
+            sender.writeObject(new Message(clientName, Message.USER_INFO, ipAddress, getTime()));
 
         } catch (SocketTimeoutException e) {
             showToast("Please check Host Address and Port.");
@@ -90,18 +91,20 @@ public class Client implements Runnable {
         return client;
     }
 
-    public void setInfo(@NotNull AppCompatActivity context, @NotNull TextView history) {
+    public void setInfo(@NotNull AppCompatActivity context, @NotNull MessageAdapter history) {
         this.context = context;
         this.history = history;
-        history.append(String.format("\nYou are connected with %s\n", HOST_NAME));
+//        history.addData(String.format("\nYou are connected with %s\n", HOST_NAME));
     }
 
     public void sendMessage(String message) {
         try {
             if (!socket.isOutputShutdown()) {
-                Log.d("message", message);
+//                Log.d("message", message.toString());
 //                sender.println(message);
-                sender.writeObject(new Message(clientName, Message.MESSAGE, message));
+                Message msg = new Message(clientName, Message.MESSAGE, message, getTime());
+                sender.writeObject(msg);
+                history.addData(msg);
                 sender.flush();
             } else {
                 throw new Exception("socket is " + socket.isConnected());
@@ -132,9 +135,9 @@ public class Client implements Runnable {
         try {
             while (true) {
                 Message message = (Message) receiver.readObject();
-                Log.d("MESSAGE", message.toString());
+                Log.d("message", "Received : " + message.toString());
                 Handler handler = new Handler(Looper.getMainLooper());
-                handler.post(() -> history.append("\n" + message.getMessage() + "\n"));
+                handler.post(() -> history.addData(message));
             }
         } catch (SocketException e) {
             Log.d("socket", "In thread " + e.toString());
@@ -156,6 +159,11 @@ public class Client implements Runnable {
         socket = null;
         client = null;
         isConnected = false;
+    }
+
+    private String getTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa");
+        return sdf.format(new Date()).toString();
     }
 
     private void showDialog(String msg) {

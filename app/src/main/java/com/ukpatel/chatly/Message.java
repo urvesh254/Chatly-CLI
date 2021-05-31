@@ -3,7 +3,7 @@ package com.ukpatel.chatly;
 import java.io.Serializable;
 
 public class Message implements Serializable {
-     private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     // Type of the messages.
     public static final int USER_INFO = 1;
@@ -14,11 +14,13 @@ public class Message implements Serializable {
     private int messageType;
     private String message;
     private String author;
+    private String time;
 
-    public Message(String author, int messageType, String message) {
+    public Message(String author, int messageType, String message, String time) {
         this.author = author;
         this.messageType = messageType;
         this.message = message;
+        this.time = time;
     }
 
     public String getAuthor() {
@@ -31,6 +33,10 @@ public class Message implements Serializable {
 
     public String getMessage() {
         return this.message;
+    }
+
+    public String getTime() {
+        return this.time;
     }
 
     @Override
