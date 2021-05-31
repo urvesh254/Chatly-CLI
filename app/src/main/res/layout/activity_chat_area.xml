@@ -23,7 +23,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:reverseLayout="true"
-        app:stackFromEnd="false" />
+        app:stackFromEnd="true" />
 
     <FrameLayout
         android:layout_width="fill_parent"
@@ -46,7 +46,7 @@
             android:layout_marginStart="12dp"
             android:layout_marginEnd="70dp"
             android:background="@null"
-            android:hint="@string/input_message_here"
+            android:hint="@string/type_a_message"
             android:maxLines="2"
             android:scrollbars="vertical" />
 

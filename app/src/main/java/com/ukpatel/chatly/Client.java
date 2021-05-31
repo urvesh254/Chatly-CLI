@@ -4,11 +4,11 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.ukpatel.chatly.adapter.MessageAdapter;
 
@@ -33,7 +33,8 @@ public class Client implements Runnable {
     private String HOST_NAME;
     private int PORT;
     public static String clientName;
-    private MessageAdapter history;
+    private MessageAdapter messageAdapter;
+    private RecyclerView recyclerView;
 
     private Socket socket = null;
     private ObjectInputStream receiver;
@@ -54,7 +55,6 @@ public class Client implements Runnable {
             isConnected = true;
             receiver = new ObjectInputStream(socket.getInputStream());
             sender = new ObjectOutputStream(socket.getOutputStream());
-            showToast("Connected to server.");
 
             readerThread.start();
 
@@ -91,20 +91,21 @@ public class Client implements Runnable {
         return client;
     }
 
-    public void setInfo(@NotNull AppCompatActivity context, @NotNull MessageAdapter history) {
+    public void setInfo(@NotNull AppCompatActivity context, @NotNull MessageAdapter history, @NotNull RecyclerView recyclerView) {
         this.context = context;
-        this.history = history;
-//        history.addData(String.format("\nYou are connected with %s\n", HOST_NAME));
+        this.messageAdapter = history;
+        this.recyclerView = recyclerView;
+        history.addData(new Message("", Message.USER_JOIN, String.format("\nYou are connected with %s\n", HOST_NAME), getTime()));
     }
 
     public void sendMessage(String message) {
         try {
             if (!socket.isOutputShutdown()) {
-//                Log.d("message", message.toString());
-//                sender.println(message);
                 Message msg = new Message(clientName, Message.MESSAGE, message, getTime());
                 sender.writeObject(msg);
-                history.addData(msg);
+
+                messageAdapter.addData(msg);
+                recyclerView.scrollToPosition(messageAdapter.getItemCount() - 1);
                 sender.flush();
             } else {
                 throw new Exception("socket is " + socket.isConnected());
@@ -137,7 +138,10 @@ public class Client implements Runnable {
                 Message message = (Message) receiver.readObject();
                 Log.d("message", "Received : " + message.toString());
                 Handler handler = new Handler(Looper.getMainLooper());
-                handler.post(() -> history.addData(message));
+                handler.post(() -> {
+                    messageAdapter.addData(message);
+                    recyclerView.scrollToPosition(messageAdapter.getItemCount() - 1);
+                });
             }
         } catch (SocketException e) {
             Log.d("socket", "In thread " + e.toString());
@@ -154,7 +158,7 @@ public class Client implements Runnable {
                 Looper.loop();
             }
         } catch (Exception e) {
-            Log.d("socket", "in thread exception : " + e);
+            Log.d("socket", "in thread exception : " + e.toString());
         }
         socket = null;
         client = null;

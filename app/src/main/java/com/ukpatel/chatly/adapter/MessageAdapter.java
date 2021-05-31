@@ -109,6 +109,7 @@ public class MessageAdapter extends RecyclerView.Adapter {
 
             message = itemView.findViewById(R.id.message);
             time = itemView.findViewById(R.id.time);
+            author = itemView.findViewById(R.id.author);
         }
     }
 

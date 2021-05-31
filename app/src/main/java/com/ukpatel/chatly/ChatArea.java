@@ -25,7 +25,6 @@ import java.util.ArrayList;
 public class ChatArea extends AppCompatActivity {
 
     private EditText msg;
-    private MessageAdapter messageAdapter;
     private Button btnSend;
     private Client client;
 
@@ -36,12 +35,12 @@ public class ChatArea extends AppCompatActivity {
 
         msg = findViewById(R.id.msgSend);
         btnSend = findViewById(R.id.btnSend);
-        RecyclerView history = findViewById(R.id.history);
-        messageAdapter = new MessageAdapter(new ArrayList<Message>(), Client.clientName);
+        RecyclerView recyclerView = findViewById(R.id.history);
+        MessageAdapter messageAdapter = new MessageAdapter(new ArrayList<Message>(), Client.clientName);
 //        history.setMovementMethod(new ScrollingMovementMethod());
 
-        history.setLayoutManager(new LinearLayoutManager(this));
-        history.setAdapter(messageAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(messageAdapter);
 
         //Check for light or dark mode
         int nightModeFlags =
@@ -50,16 +49,16 @@ public class ChatArea extends AppCompatActivity {
         switch (nightModeFlags) {
             case Configuration.UI_MODE_NIGHT_YES:
             case Configuration.UI_MODE_NIGHT_UNDEFINED:
-                history.setBackgroundColor(getResources().getColor(R.color.black));
+                recyclerView.setBackgroundColor(getResources().getColor(R.color.black));
                 break;
 
             case Configuration.UI_MODE_NIGHT_NO:
-                history.setBackgroundColor(getResources().getColor(R.color.white));
+                recyclerView.setBackgroundColor(getResources().getColor(R.color.white));
                 break;
         }
 
         client = Client.getInstance();
-        client.setInfo(this, messageAdapter);
+        client.setInfo(this, messageAdapter, recyclerView);
 
         btnSend.setOnClickListener(view -> {
             String message = msg.getText().toString().trim();

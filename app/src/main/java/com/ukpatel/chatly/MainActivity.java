@@ -161,7 +161,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             );
             if (client.isSocketConnected()) {
                 Log.d("socket", "in main socket connected: " + client.isSocketConnected());
-                Toast.makeText(this, "Connected to server.", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(MainActivity.this, ChatArea.class));
                 this.finish();
             } else {
