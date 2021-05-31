@@ -1,4 +1,6 @@
 import java.net.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.io.*;
 import com.ukpatel.chatly.Message;
 
@@ -25,7 +27,8 @@ public class Client implements Runnable {
 			ObjectOutputStream writer = new ObjectOutputStream(socket.getOutputStream());
 
 			// Sending Information of the client.
-			writer.writeObject(new Message(clientName, Message.USER_INFO, InetAddress.getLocalHost().toString()));
+			writer.writeObject(
+					new Message(clientName, Message.USER_INFO, InetAddress.getLocalHost().toString(), getTime()));
 			System.out.println(String.format("\nYou are connected with %s\n", HOST_NAME));
 
 			String message;
@@ -34,10 +37,10 @@ public class Client implements Runnable {
 				if (message.isEmpty()) {
 					continue;
 				} else if (message.equals("exit")) {
-					writer.writeObject(new Message(clientName, Message.USER_EXIT, ""));
+					writer.writeObject(new Message(clientName, Message.USER_EXIT, "", getTime()));
 					break;
 				} else {
-					writer.writeObject(new Message(clientName, Message.MESSAGE, message));
+					writer.writeObject(new Message(clientName, Message.MESSAGE, message, getTime()));
 				}
 			}
 			if (readerThread.isAlive()) {
@@ -61,6 +64,11 @@ public class Client implements Runnable {
 			}
 		}
 		System.exit(0);
+	}
+
+	private String getTime() {
+		SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa");
+		return sdf.format(new Date()).toString();
 	}
 
 	private void getClientInfo() throws IOException {
