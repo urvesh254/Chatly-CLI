@@ -48,8 +48,7 @@ public class Server implements Runnable {
 					throw new Exception();
 				} else {
 					System.out.println(clientName + " : " + message.getMessage());
-					sendOtherClients(new Message(clientName, Message.MESSAGE, clientName + " : " + message.getMessage(),
-							getTime()));
+					sendOtherClients(new Message(clientName, Message.MESSAGE, message.getMessage(), getTime()));
 				}
 			}
 
