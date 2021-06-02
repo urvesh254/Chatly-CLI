@@ -3,6 +3,7 @@ package com.ukpatel.layouts;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import java.awt.BorderLayout;
@@ -15,6 +16,7 @@ import com.ukpatel.chatly.Message;
 
 public class ChatArea extends JPanel {
     private JPanel messages;
+    JScrollPane scrollPane;
     private Box vertical = Box.createVerticalBox();
 
     private JTextField inputMessage;
@@ -28,13 +30,20 @@ public class ChatArea extends JPanel {
         this.setLayout(new BorderLayout());
 
         messages = new JPanel(new BorderLayout());
-        add(messages, BorderLayout.CENTER);
+        scrollPane = new JScrollPane(messages);
+        scrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+            public void adjustmentValueChanged(AdjustmentEvent e) {
+                e.getAdjustable().setValue(e.getAdjustable().getMaximum());
+            }
+        });
+        add(scrollPane, BorderLayout.CENTER);
 
         JPanel inputPanel = new JPanel(new BorderLayout());
 
         inputMessage = new JTextField();
         inputMessage.setFont(lostFont);
         inputMessage.setText(HINT);
+        inputMessage.setFocusable(true);
         inputMessage.setForeground(Color.gray);
         inputMessage.setBackground(Color.lightGray);
         inputMessage.setMaximumSize(new Dimension(500, 30));

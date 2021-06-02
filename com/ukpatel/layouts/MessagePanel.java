@@ -59,7 +59,8 @@ public class MessagePanel extends JPanel {
         JLabel msgLabel = new JLabel(formatedMessage);
         msgLabel.setOpaque(true);
         msgLabel.setBackground(new Color(37, 211, 102));
-        msgLabel.setBorder(new EmptyBorder(5, 0, 5, 5));
+        msgLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
+        msgLabel.setBorder(new EmptyBorder(2, 0, 0, 2));
         sendPanel.add(msgLabel, BorderLayout.CENTER);
 
         JLabel timeLabel = new JLabel(message.getTime(), SwingConstants.RIGHT);
@@ -87,7 +88,8 @@ public class MessagePanel extends JPanel {
         JLabel msgLabel = new JLabel(formatedMessage);
         msgLabel.setOpaque(true);
         msgLabel.setBackground(new Color(37, 211, 102));
-        msgLabel.setBorder(new EmptyBorder(5, 0, 5, 5));
+        msgLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
+        msgLabel.setBorder(new EmptyBorder(2, 0, 0, 2));
         receivePanel.add(msgLabel, BorderLayout.CENTER);
 
         JLabel timeLabel = new JLabel(message.getTime(), SwingConstants.RIGHT);
