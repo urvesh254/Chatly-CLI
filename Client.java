@@ -6,8 +6,8 @@ import com.ukpatel.chatly.Message;
 
 public class Client implements Runnable {
 
-	private static int PORT;
-	private static String HOST_NAME;
+	private int PORT;
+	private String HOST_NAME;
 
 	private String clientName;
 	private Thread readerThread;
