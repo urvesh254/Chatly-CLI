@@ -6,7 +6,7 @@ import java.net.InetAddress;
 
 public class InfoPanel extends JPanel {
 
-    private JTextField userName;
+    private JTextField clientName;
     private JTextField serverAddress;
     private JTextField serverPortNo;
     private JButton connect;
@@ -35,10 +35,10 @@ public class InfoPanel extends JPanel {
             playerNameLabel.setFont(new Font("Arial", Font.BOLD, 18));
             playerNameInfo.add(playerNameLabel);
 
-            userName = new JTextField(InetAddress.getLocalHost().getHostName());
-            userName.setFont(new Font("Arial", Font.PLAIN, 18));
-            userName.setPreferredSize(new Dimension(170, 30));
-            playerNameInfo.add(userName);
+            clientName = new JTextField(InetAddress.getLocalHost().getHostName());
+            clientName.setFont(new Font("Arial", Font.PLAIN, 18));
+            clientName.setPreferredSize(new Dimension(170, 30));
+            playerNameInfo.add(clientName);
 
             // Server Host Information.
             JPanel serverHostInfo = new JPanel();
@@ -47,7 +47,7 @@ public class InfoPanel extends JPanel {
             labelServerHostInfo.setFont(new Font("Arial", Font.BOLD, 18));
             serverHostInfo.add(labelServerHostInfo);
 
-            serverAddress = new JTextField("");
+            serverAddress = new JTextField("ukpatel");
             serverAddress.setPreferredSize(new Dimension(170, 30));
             serverAddress.setFont(new Font("Arial", Font.PLAIN, 18));
             serverHostInfo.add(serverAddress);
@@ -88,8 +88,8 @@ public class InfoPanel extends JPanel {
 
     }
 
-    public String getUserName() {
-        return this.userName.getText();
+    public String getClientName() {
+        return this.clientName.getText();
     }
 
     public String getServerAddress() {

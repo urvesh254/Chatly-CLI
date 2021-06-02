@@ -3,10 +3,7 @@ package com.ukpatel.layouts;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.border.Border;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -20,7 +17,7 @@ public class ChatArea extends JPanel {
     private JPanel messages;
     private Box vertical = Box.createVerticalBox();
 
-    private JTextArea inputMessage;
+    private JTextField inputMessage;
     private JButton btnSend;
 
     private Font gainFont = new Font("Tahoma", Font.PLAIN, 20);
@@ -35,9 +32,7 @@ public class ChatArea extends JPanel {
 
         JPanel inputPanel = new JPanel(new BorderLayout());
 
-        inputMessage = new JTextArea(1, 10);
-        inputMessage.setWrapStyleWord(true);
-        inputMessage.setLineWrap(true);
+        inputMessage = new JTextField();
         inputMessage.setFont(lostFont);
         inputMessage.setText(HINT);
         inputMessage.setForeground(Color.gray);
@@ -48,37 +43,36 @@ public class ChatArea extends JPanel {
 
             @Override
             public void focusGained(FocusEvent e) {
-                JTextArea textArea = (JTextArea) e.getSource();
-                if (textArea.getText().equals(HINT)) {
-                    textArea.setText("");
-                    textArea.setFont(gainFont);
+                JTextField textField = (JTextField) e.getSource();
+                if (textField.getText().equals(HINT)) {
+                    textField.setText("");
+                    textField.setFont(gainFont);
                 } else {
-                    textArea.setText(textArea.getText());
-                    textArea.setFont(gainFont);
+                    textField.setText(textField.getText());
+                    textField.setFont(gainFont);
                 }
-                textArea.setForeground(Color.BLACK);
+                textField.setForeground(Color.BLACK);
             }
 
             @Override
             public void focusLost(FocusEvent e) {
-                JTextArea textArea = (JTextArea) e.getSource();
-                if (textArea.getText().equals(HINT) || textArea.getText().length() == 0) {
-                    textArea.setText(HINT);
-                    textArea.setFont(lostFont);
-                    textArea.setForeground(Color.GRAY);
+                JTextField textField = (JTextField) e.getSource();
+                if (textField.getText().equals(HINT) || textField.getText().length() == 0) {
+                    textField.setText(HINT);
+                    textField.setFont(lostFont);
+                    textField.setForeground(Color.GRAY);
                 } else {
-                    textArea.setText(textArea.getText());
-                    textArea.setFont(gainFont);
-                    textArea.setForeground(Color.BLACK);
+                    textField.setText(textField.getText());
+                    textField.setFont(gainFont);
+                    textField.setForeground(Color.BLACK);
                 }
             }
         });
-
-        JScrollPane jScrollPane = new JScrollPane(inputMessage);
-        inputPanel.add(jScrollPane, BorderLayout.CENTER);
+        inputPanel.add(inputMessage, BorderLayout.CENTER);
 
         btnSend = new JButton("Send");
         btnSend.setFont(new Font("Tahoma", Font.BOLD, 25));
+        btnSend.setBackground(new Color(37, 211, 102));
         inputPanel.add(btnSend, BorderLayout.LINE_END);
 
         add(inputPanel, BorderLayout.SOUTH);
@@ -88,7 +82,7 @@ public class ChatArea extends JPanel {
         vertical.add(new MessagePanel(message, messageType));
         vertical.add(Box.createVerticalStrut(10));
 
-        add(vertical, BorderLayout.PAGE_START);
+        messages.add(vertical, BorderLayout.PAGE_START);
         validate();
     }
 
@@ -101,5 +95,13 @@ public class ChatArea extends JPanel {
             return "";
         }
         return this.inputMessage.getText();
+    }
+
+    public void clearInputText() {
+        this.inputMessage.setText("");
+    }
+
+    public JTextField getInputMessage() {
+        return this.inputMessage;
     }
 }

@@ -55,12 +55,12 @@ public class MessagePanel extends JPanel {
         // // msgLabel.setBorder(new EmptyBorder(5, 0, 5, 5));
         // sendPanel.add(msgLabel, BorderLayout.CENTER);
 
-        JLabel l1 = new JLabel("<html><p style = \"width : 150px\">" + message.getMessage() + "</p></html>");
-        l1.setFont(new Font("Tahoma", Font.PLAIN, 16));
-        l1.setBackground(new Color(37, 211, 102));
-        l1.setOpaque(true);
-        l1.setBorder(new EmptyBorder(15, 15, 15, 50));
-        sendPanel.add(l1, BorderLayout.CENTER);
+        String formatedMessage = "<html><p style=\"width:150px;\">" + message.getMessage() + "</p></html>";
+        JLabel msgLabel = new JLabel(formatedMessage);
+        msgLabel.setOpaque(true);
+        msgLabel.setBackground(new Color(37, 211, 102));
+        msgLabel.setBorder(new EmptyBorder(5, 0, 5, 5));
+        sendPanel.add(msgLabel, BorderLayout.CENTER);
 
         JLabel timeLabel = new JLabel(message.getTime(), SwingConstants.RIGHT);
         timeLabel.setOpaque(true);

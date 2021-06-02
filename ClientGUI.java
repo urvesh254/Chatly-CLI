@@ -1,23 +1,37 @@
 import java.awt.CardLayout;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyAdapter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.ConnectException;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
 
+import com.ukpatel.chatly.Message;
 import com.ukpatel.layouts.ChatArea;
 import com.ukpatel.layouts.InfoPanel;
+import com.ukpatel.layouts.MessagePanel;
 
-public class ClientGUI extends JFrame {
+public class ClientGUI extends JFrame implements Runnable {
 
     private ChatArea chatArea;
     private InfoPanel infoPanel;
     private CardLayout card;
 
-    private String userName;
+    private String clientName;
     private String HOST_ADDRESS;
     private int PORT;
+
+    private Socket socket;
+    private ObjectOutputStream sender;
 
     public ClientGUI() {
         card = new CardLayout();
@@ -29,15 +43,7 @@ public class ClientGUI extends JFrame {
         chatArea = new ChatArea();
         add(chatArea, "chatArea");
 
-        infoPanel.getConnectButton().addActionListener(e -> {
-            if (isInvalidInfo()) {
-                return;
-            }
-
-            // connect with socket.
-
-            card.show(getContentPane(), "chatArea");
-        });
+        addActionListeners();
 
         setSize(500, 700);
         setLocationRelativeTo(null);
@@ -46,9 +52,86 @@ public class ClientGUI extends JFrame {
         setTitle("Chatly");
     }
 
+    private void addActionListeners() {
+
+        infoPanel.getConnectButton().addActionListener(e -> {
+            if (isInvalidInfo()) {
+                return;
+            }
+            // connect with socket.
+            if (isConnected()) {
+                card.show(getContentPane(), "chatArea");
+            }
+        });
+
+        chatArea.getBtnSend().addActionListener(e -> {
+            if (chatArea.getMessageText().isEmpty()) {
+                return;
+            }
+            sendMessage(chatArea.getMessageText());
+        });
+
+        chatArea.getInputMessage().addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.getKeyChar() == '\n') {
+                    if (chatArea.getMessageText().isEmpty()) {
+                        return;
+                    }
+                    sendMessage(chatArea.getMessageText());
+                }
+            }
+
+        });
+    }
+
+    private void sendMessage(String messageText) {
+        Message message = new Message(clientName, Message.MESSAGE, messageText, getTime());
+        try {
+            sender.writeObject(message);
+            chatArea.addMessage(message, MessagePanel.USER_SEND);
+            chatArea.clearInputText();
+        } catch (SocketException e) {
+            showToast("Server is closed.");
+        } catch (Exception e) {
+            showToast("Some problem in connection. \nRestart the application and reconnect to ther server.");
+        }
+    }
+
+    private boolean isConnected() {
+        try {
+            Thread readerThread = new Thread(this);
+            socket = new Socket(HOST_ADDRESS, PORT);
+            readerThread.start();
+            sender = new ObjectOutputStream(socket.getOutputStream());
+
+            // Sending Information of the client.
+            sender.writeObject(
+                    new Message(clientName, Message.USER_INFO, InetAddress.getLocalHost().toString(), getTime()));
+            String msg = String.format("\nYou are connected with %s\n", HOST_ADDRESS);
+            chatArea.addMessage(new Message(clientName, Message.USER_INFO, msg, getTime()), MessagePanel.USER_INFO);
+        } catch (UnknownHostException e) {
+            showToast("\nServer is not available on " + HOST_ADDRESS);
+            return false;
+        } catch (ConnectException e) {
+            showToast("\nNo Server running on Port " + PORT);
+            return false;
+        } catch (SocketException e) {
+            showToast("\nServer is closed.");
+            return false;
+        } catch (IOException e) {
+            showToast("\nInput/Output interruption.");
+            return false;
+        } catch (Exception e) {
+            showToast("\nSomething is wrong.");
+            return false;
+        }
+        return true;
+    }
+
     private boolean isInvalidInfo() {
 
-        if (infoPanel.getUserName().isEmpty()) {
+        if (infoPanel.getClientName().isEmpty()) {
             showToast("Name should not be empty.");
             return true;
         }
@@ -70,6 +153,10 @@ public class ClientGUI extends JFrame {
             return true;
         }
 
+        clientName = infoPanel.getClientName();
+        HOST_ADDRESS = infoPanel.getServerAddress();
+        PORT = Integer.parseInt(infoPanel.getServerPortNo());
+
         return false;
     }
 
@@ -86,5 +173,24 @@ public class ClientGUI extends JFrame {
 
     private void showToast(String msg) {
         JOptionPane.showMessageDialog(this, msg, "Error Message", JOptionPane.WARNING_MESSAGE);
+    }
+
+    @Override
+    public void run() {
+        try (ObjectInputStream reader = new ObjectInputStream(socket.getInputStream())) {
+
+            Message message;
+            while (true) {
+                message = (Message) reader.readObject();
+                if (message.getMessageType() == Message.MESSAGE)
+                    chatArea.addMessage(message, MessagePanel.USER_RECEIVE);
+                else
+                    chatArea.addMessage(message, MessagePanel.USER_INFO);
+            }
+        } catch (SocketException e) {
+            showToast("Server is closed.");
+        } catch (Exception e) {
+            showToast("Some problem in connection. \nRestart the application and reconnect to ther server.");
+        }
     }
 }
