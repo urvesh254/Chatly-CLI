@@ -1,4 +1,5 @@
 import java.awt.CardLayout;
+import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyAdapter;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -46,6 +48,7 @@ public class ClientGUI extends JFrame implements Runnable {
         addActionListeners();
 
         setSize(500, 700);
+        setIconImage(new ImageIcon("./assets/Chatly_logo.png").getImage());
         setLocationRelativeTo(null);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

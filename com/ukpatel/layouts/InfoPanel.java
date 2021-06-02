@@ -47,7 +47,7 @@ public class InfoPanel extends JPanel {
             labelServerHostInfo.setFont(new Font("Arial", Font.BOLD, 18));
             serverHostInfo.add(labelServerHostInfo);
 
-            serverAddress = new JTextField("ukpatel");
+            serverAddress = new JTextField("");
             serverAddress.setPreferredSize(new Dimension(170, 30));
             serverAddress.setFont(new Font("Arial", Font.PLAIN, 18));
             serverHostInfo.add(serverAddress);
