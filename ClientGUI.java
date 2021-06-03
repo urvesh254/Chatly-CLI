@@ -94,6 +94,7 @@ public class ClientGUI extends JFrame implements Runnable {
         // connect with socket.
         if (isConnected()) {
             card.show(getContentPane(), "chatArea");
+            chatArea.getInputMessage().requestFocusInWindow();
         }
     }
 

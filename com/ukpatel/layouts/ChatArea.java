@@ -3,9 +3,11 @@ package com.ukpatel.layouts;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import java.awt.Adjustable;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -38,7 +40,6 @@ public class ChatArea extends JPanel {
         inputMessage = new JTextField();
         inputMessage.setFont(lostFont);
         inputMessage.setText(HINT);
-        inputMessage.setFocusable(true);
         inputMessage.setForeground(Color.gray);
         inputMessage.setBackground(Color.lightGray);
         inputMessage.setMaximumSize(new Dimension(500, 30));
@@ -87,8 +88,22 @@ public class ChatArea extends JPanel {
         vertical.add(Box.createVerticalStrut(10));
 
         messages.add(vertical, BorderLayout.PAGE_START);
-        scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMinimum());
+        inputMessage.requestFocusInWindow();
+        scrollToBottom(scrollPane);
         validate();
+    }
+
+    private void scrollToBottom(JScrollPane scrollPane) {
+        JScrollBar verticalBar = scrollPane.getVerticalScrollBar();
+        AdjustmentListener downScroller = new AdjustmentListener() {
+            @Override
+            public void adjustmentValueChanged(AdjustmentEvent e) {
+                Adjustable adjustable = e.getAdjustable();
+                adjustable.setValue(adjustable.getMaximum());
+                verticalBar.removeAdjustmentListener(this);
+            }
+        };
+        verticalBar.addAdjustmentListener(downScroller);
     }
 
     public JButton getBtnSend() {
