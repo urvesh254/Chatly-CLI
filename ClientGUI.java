@@ -1,7 +1,6 @@
 import java.awt.CardLayout;
-import java.awt.Image;
-import java.awt.event.KeyEvent;
 import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -10,8 +9,6 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -89,7 +86,7 @@ public class ClientGUI extends JFrame implements Runnable {
     }
 
     private void sendMessage(String messageText) {
-        Message message = new Message(clientName, Message.MESSAGE, messageText, getTime());
+        Message message = new Message(clientName, Message.MESSAGE, messageText);
         try {
             sender.writeObject(message);
             chatArea.addMessage(message, MessagePanel.USER_SEND);
@@ -109,10 +106,9 @@ public class ClientGUI extends JFrame implements Runnable {
             sender = new ObjectOutputStream(socket.getOutputStream());
 
             // Sending Information of the client.
-            sender.writeObject(
-                    new Message(clientName, Message.USER_INFO, InetAddress.getLocalHost().toString(), getTime()));
+            sender.writeObject(new Message(clientName, Message.USER_INFO, InetAddress.getLocalHost().toString()));
             String msg = String.format("\nYou are connected with %s\n", HOST_ADDRESS);
-            chatArea.addMessage(new Message(clientName, Message.USER_INFO, msg, getTime()), MessagePanel.USER_INFO);
+            chatArea.addMessage(new Message(clientName, Message.USER_INFO, msg), MessagePanel.USER_INFO);
         } catch (UnknownHostException e) {
             showToast("\nServer is not available on " + HOST_ADDRESS);
             return false;
@@ -165,13 +161,6 @@ public class ClientGUI extends JFrame implements Runnable {
 
     public static void main(String[] args) {
         new ClientGUI().setVisible(true);
-    }
-
-    private String getTime() {
-        //Displaying current date and time in 12 hour format with AM/PM
-        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa");
-        String time = sdf.format(new Date()).toString();
-        return time;
     }
 
     private void showToast(String msg) {

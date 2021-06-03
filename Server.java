@@ -1,8 +1,14 @@
-import java.net.*;
-import java.text.SimpleDateFormat;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.BindException;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.Date;
 
 import com.ukpatel.chatly.Message;
 
@@ -38,7 +44,7 @@ public class Server implements Runnable {
 			clientName = userInfo.getAuthor();
 			String ipAddress = userInfo.getMessage();
 
-			sendOtherClients(new Message(clientName, Message.USER_JOIN, clientName + " is join the chat.", getTime()));
+			sendOtherClients(new Message(clientName, Message.USER_JOIN, clientName + " is join the chat."));
 			System.out.println(clientName + " at " + ipAddress + " is join the chat.");
 
 			Message message;
@@ -48,13 +54,13 @@ public class Server implements Runnable {
 					throw new Exception();
 				} else {
 					System.out.println(clientName + " : " + message.getMessage());
-					sendOtherClients(new Message(clientName, Message.MESSAGE, message.getMessage(), getTime()));
+					sendOtherClients(new Message(clientName, Message.MESSAGE, message.getMessage()));
 				}
 			}
 
 		} catch (Exception e) {
 			System.out.println(clientName + " left the chat.");
-			sendOtherClients(new Message("Server", Message.USER_EXIT, clientName + " left the chat.", getTime()));
+			sendOtherClients(new Message("Server", Message.USER_EXIT, clientName + " left the chat."));
 		} finally {
 			clientsOutputStreams.remove(writer);
 			clientsInputStreams.remove(reader);
@@ -75,11 +81,6 @@ public class Server implements Runnable {
 		} catch (Exception e) {
 		}
 
-	}
-
-	private String getTime() {
-		SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa");
-		return sdf.format(new Date()).toString();
 	}
 
 	public static void main(String arg[]) {

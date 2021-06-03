@@ -1,7 +1,14 @@
-import java.net.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.ConnectException;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+
 import com.ukpatel.chatly.Message;
 
 public class Client implements Runnable {
@@ -27,8 +34,7 @@ public class Client implements Runnable {
 			ObjectOutputStream writer = new ObjectOutputStream(socket.getOutputStream());
 
 			// Sending Information of the client.
-			writer.writeObject(
-					new Message(clientName, Message.USER_INFO, InetAddress.getLocalHost().toString(), getTime()));
+			writer.writeObject(new Message(clientName, Message.USER_INFO, InetAddress.getLocalHost().toString()));
 			System.out.println(String.format("\nYou are connected with %s\n", HOST_NAME));
 
 			String message;
@@ -37,10 +43,10 @@ public class Client implements Runnable {
 				if (message.isEmpty()) {
 					continue;
 				} else if (message.equals("exit")) {
-					writer.writeObject(new Message(clientName, Message.USER_EXIT, "", getTime()));
+					writer.writeObject(new Message(clientName, Message.USER_EXIT, ""));
 					break;
 				} else {
-					writer.writeObject(new Message(clientName, Message.MESSAGE, message, getTime()));
+					writer.writeObject(new Message(clientName, Message.MESSAGE, message));
 				}
 			}
 			if (readerThread.isAlive()) {
@@ -64,11 +70,6 @@ public class Client implements Runnable {
 			}
 		}
 		System.exit(0);
-	}
-
-	private String getTime() {
-		SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa");
-		return sdf.format(new Date()).toString();
 	}
 
 	private void getClientInfo() throws IOException {
