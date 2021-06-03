@@ -59,7 +59,7 @@ public class Client implements Runnable {
             readerThread.start();
 
             // Sending Information of the client.
-            sender.writeObject(new Message(clientName, Message.USER_INFO, ipAddress, getTime()));
+            sender.writeObject(new Message(clientName, Message.USER_INFO, ipAddress));
 
         } catch (SocketTimeoutException e) {
             showToast("Please check Host Address and Port.");
@@ -95,13 +95,13 @@ public class Client implements Runnable {
         this.context = context;
         this.messageAdapter = history;
         this.recyclerView = recyclerView;
-        history.addData(new Message("", Message.USER_JOIN, String.format("\nYou are connected with %s\n", HOST_NAME), getTime()));
+        history.addData(new Message("", Message.USER_JOIN, String.format("\nYou are connected with %s\n", HOST_NAME)));
     }
 
     public void sendMessage(String message) {
         try {
             if (!socket.isOutputShutdown()) {
-                Message msg = new Message(clientName, Message.MESSAGE, message, getTime());
+                Message msg = new Message(clientName, Message.MESSAGE, message);
                 sender.writeObject(msg);
 
                 messageAdapter.addData(msg);
@@ -163,11 +163,6 @@ public class Client implements Runnable {
         socket = null;
         client = null;
         isConnected = false;
-    }
-
-    private String getTime() {
-        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa");
-        return sdf.format(new Date()).toString();
     }
 
     private void showDialog(String msg) {
