@@ -16,7 +16,7 @@ import com.ukpatel.chatly.Message;
 
 public class ChatArea extends JPanel {
     private JPanel messages;
-    JScrollPane scrollPane;
+    private JScrollPane scrollPane;
     private Box vertical = Box.createVerticalBox();
 
     private JTextField inputMessage;
@@ -31,11 +31,6 @@ public class ChatArea extends JPanel {
 
         messages = new JPanel(new BorderLayout());
         scrollPane = new JScrollPane(messages);
-        scrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
-            public void adjustmentValueChanged(AdjustmentEvent e) {
-                e.getAdjustable().setValue(e.getAdjustable().getMaximum());
-            }
-        });
         add(scrollPane, BorderLayout.CENTER);
 
         JPanel inputPanel = new JPanel(new BorderLayout());
@@ -92,6 +87,7 @@ public class ChatArea extends JPanel {
         vertical.add(Box.createVerticalStrut(10));
 
         messages.add(vertical, BorderLayout.PAGE_START);
+        scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMinimum());
         validate();
     }
 
@@ -106,7 +102,7 @@ public class ChatArea extends JPanel {
         return this.inputMessage.getText();
     }
 
-    public void clearInputText() {
+    public void clearInputMessageField() {
         this.inputMessage.setText("");
     }
 

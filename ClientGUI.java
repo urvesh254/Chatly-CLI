@@ -55,12 +55,13 @@ public class ClientGUI extends JFrame implements Runnable {
     private void addActionListeners() {
 
         infoPanel.getConnectButton().addActionListener(e -> {
-            if (isInvalidInfo()) {
-                return;
-            }
-            // connect with socket.
-            if (isConnected()) {
-                card.show(getContentPane(), "chatArea");
+            connectToServer();
+        });
+
+        infoPanel.getConnectButton().addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                connectToServer();
             }
         });
 
@@ -83,6 +84,17 @@ public class ClientGUI extends JFrame implements Runnable {
             }
 
         });
+
+    }
+
+    private void connectToServer() {
+        if (isInvalidInfo()) {
+            return;
+        }
+        // connect with socket.
+        if (isConnected()) {
+            card.show(getContentPane(), "chatArea");
+        }
     }
 
     private void sendMessage(String messageText) {
@@ -90,7 +102,7 @@ public class ClientGUI extends JFrame implements Runnable {
         try {
             sender.writeObject(message);
             chatArea.addMessage(message, MessagePanel.USER_SEND);
-            chatArea.clearInputText();
+            chatArea.clearInputMessageField();
         } catch (SocketException e) {
             showToast("Server is closed.");
         } catch (Exception e) {
