@@ -1,3 +1,4 @@
 *.class
 *.jar
 .vscode/
+MENIFEST.MF
