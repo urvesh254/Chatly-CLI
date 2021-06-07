@@ -34,7 +34,7 @@ public class Client implements Runnable {
 			ObjectOutputStream writer = new ObjectOutputStream(socket.getOutputStream());
 
 			// Sending Information of the client.
-			writer.writeObject(new Message(clientName, Message.USER_INFO, InetAddress.getLocalHost().toString()));
+			writer.writeObject(new Message(clientName, Message.USER_JOIN, InetAddress.getLocalHost().toString()));
 			System.out.println(String.format("\nYou are connected with %s\n", HOST_NAME));
 
 			String message;
@@ -46,7 +46,7 @@ public class Client implements Runnable {
 					writer.writeObject(new Message(clientName, Message.USER_EXIT, ""));
 					break;
 				} else {
-					writer.writeObject(new Message(clientName, Message.MESSAGE, message));
+					writer.writeObject(new Message(clientName, Message.MESSAGE_SEND, message));
 				}
 			}
 			if (readerThread.isAlive()) {
@@ -96,7 +96,7 @@ public class Client implements Runnable {
 			Message message;
 			while (true) {
 				message = (Message) reader.readObject();
-				System.out.println(message.getMessage());
+				System.out.println(message.getAuthor() + " : " + message.getMessage());
 			}
 		} catch (SocketException e) {
 			System.out.println("Server is closed.");

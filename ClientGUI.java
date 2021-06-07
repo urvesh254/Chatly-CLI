@@ -99,7 +99,7 @@ public class ClientGUI extends JFrame implements Runnable {
     }
 
     private void sendMessage(String messageText) {
-        Message message = new Message(clientName, Message.MESSAGE, messageText);
+        Message message = new Message(clientName, Message.MESSAGE_SEND, messageText);
         try {
             sender.writeObject(message);
             chatArea.addMessage(message, MessagePanel.USER_SEND);
@@ -119,9 +119,9 @@ public class ClientGUI extends JFrame implements Runnable {
             sender = new ObjectOutputStream(socket.getOutputStream());
 
             // Sending Information of the client.
-            sender.writeObject(new Message(clientName, Message.USER_INFO, InetAddress.getLocalHost().toString()));
+            sender.writeObject(new Message(clientName, Message.USER_JOIN, InetAddress.getLocalHost().toString()));
             String msg = String.format("\nYou are connected with %s\n", HOST_ADDRESS);
-            chatArea.addMessage(new Message(clientName, Message.USER_INFO, msg), MessagePanel.USER_INFO);
+            chatArea.addMessage(new Message(clientName, Message.USER_JOIN, msg), MessagePanel.USER_INFO);
         } catch (UnknownHostException e) {
             showToast("\nServer is not available on " + HOST_ADDRESS);
             return false;
@@ -187,7 +187,7 @@ public class ClientGUI extends JFrame implements Runnable {
             Message message;
             while (true) {
                 message = (Message) reader.readObject();
-                if (message.getMessageType() == Message.MESSAGE)
+                if (message.getMessageType() == Message.MESSAGE_RECEIVE)
                     chatArea.addMessage(message, MessagePanel.USER_RECEIVE);
                 else
                     chatArea.addMessage(message, MessagePanel.USER_INFO);

@@ -54,7 +54,7 @@ public class Server implements Runnable {
 					throw new Exception();
 				} else {
 					System.out.println(clientName + " : " + message.getMessage());
-					sendOtherClients(new Message(clientName, Message.MESSAGE, message.getMessage()));
+					sendOtherClients(new Message(clientName, Message.MESSAGE_RECEIVE, message.getMessage()));
 				}
 			}
 
