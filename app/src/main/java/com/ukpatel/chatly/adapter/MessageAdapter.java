@@ -73,14 +73,14 @@ public class MessageAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemViewType(int position) {
         Message message = messages.get(position);
-        if (message.getAuthor().equals(userName)) {
-            return MESSAGE_SENT;
-        } else if (message.getMessageType() == Message.USER_EXIT) {
+        if (message.getMessageType() == Message.USER_EXIT) {
             return MESSAGE_INFO;
         } else if (message.getMessageType() == Message.USER_JOIN) {
             return MESSAGE_INFO;
-        } else {
+        }else if (message.getMessageType() == Message.MESSAGE_RECEIVE) {
             return MESSAGE_RECEIVE;
+        }  else {
+            return MESSAGE_SENT;
         }
     }
 

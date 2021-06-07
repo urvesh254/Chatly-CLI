@@ -59,7 +59,7 @@ public class Client implements Runnable {
             readerThread.start();
 
             // Sending Information of the client.
-            sender.writeObject(new Message(clientName, Message.USER_INFO, ipAddress));
+            sender.writeObject(new Message(clientName, Message.USER_JOIN, ipAddress));
 
         } catch (SocketTimeoutException e) {
             showToast("Please check Host Address and Port.");
@@ -101,7 +101,7 @@ public class Client implements Runnable {
     public void sendMessage(String message) {
         try {
             if (!socket.isOutputShutdown()) {
-                Message msg = new Message(clientName, Message.MESSAGE, message);
+                Message msg = new Message(clientName, Message.MESSAGE_SEND, message);
                 sender.writeObject(msg);
 
                 messageAdapter.addData(msg);
