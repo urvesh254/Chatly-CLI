@@ -40,20 +40,7 @@ public class MessagePanel extends JPanel {
 
     private JPanel getSendPanel(Message message) {
         JPanel sendPanel = new JPanel();
-        // sendPanel.setLayout(new BoxLayout(sendPanel, BoxLayout.Y_AXIS));
         sendPanel.setLayout(new BorderLayout());
-
-        // // String formatedMessage = "<html><pre style=\"width:280px;\">" + message.getMessage() + "</pre></html>";
-        // // JLabel msgLabel = new JLabel(formatedMessage);
-        // // JLabel msgLabel = new JLabel(message.getMessage());
-        // JTextArea msgLabel = new JTextArea(message.getMessage());
-        // msgLabel.setEditable(false);
-        // msgLabel.setLineWrap(true);
-        // msgLabel.setWrapStyleWord(true);
-        // msgLabel.setOpaque(true);
-        // msgLabel.setBackground(new Color(37, 211, 102));
-        // // msgLabel.setBorder(new EmptyBorder(5, 0, 5, 5));
-        // sendPanel.add(msgLabel, BorderLayout.CENTER);
 
         String formatedMessage = "<html><p style=\"width:150px;\">" + message.getMessage() + "</p></html>";
         JLabel msgLabel = new JLabel(formatedMessage);
@@ -80,6 +67,7 @@ public class MessagePanel extends JPanel {
         JLabel authorLabel = new JLabel(message.getAuthor());
         authorLabel.setOpaque(true);
         authorLabel.setBorder(new EmptyBorder(2, 2, 0, 0));
+        authorLabel.setForeground(Color.RED);
         authorLabel.setBackground(new Color(37, 211, 102));
         authorLabel.setFont(new Font("Time New Roman", Font.PLAIN, 11));
         receivePanel.add(authorLabel, BorderLayout.PAGE_START);

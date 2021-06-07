@@ -194,6 +194,7 @@ public class ClientGUI extends JFrame implements Runnable {
             }
         } catch (SocketException e) {
             showToast("Server is closed.");
+            card.show(getContentPane(), "infoPanel");
         } catch (Exception e) {
             showToast("Some problem in connection. \nRestart the application and reconnect to ther server.");
         }
