@@ -173,7 +173,11 @@ public class ClientGUI extends JFrame implements Runnable {
     }
 
     public static void main(String[] args) {
-        new ClientGUI().setVisible(true);
+        try {
+            new ClientGUI().setVisible(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void showToast(String msg) {
