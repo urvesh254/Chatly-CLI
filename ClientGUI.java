@@ -61,7 +61,8 @@ public class ClientGUI extends JFrame implements Runnable {
         infoPanel.getConnectButton().addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                connectToServer();
+                if (e.getKeyCode() == '\n')
+                    connectToServer();
             }
         });
 
@@ -200,6 +201,7 @@ public class ClientGUI extends JFrame implements Runnable {
             showToast("Server is closed.");
             card.show(getContentPane(), "infoPanel");
         } catch (Exception e) {
+            e.printStackTrace();
             showToast("Some problem in connection. \nRestart the application and reconnect to ther server.");
         }
     }

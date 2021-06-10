@@ -2,12 +2,10 @@ package com.ukpatel.layouts;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
@@ -98,4 +96,5 @@ public class MessagePanel extends JPanel {
         formattedMessage.append("</p>").append("</body>").append("</html>");
         return formattedMessage.toString();
     }
+
 }
