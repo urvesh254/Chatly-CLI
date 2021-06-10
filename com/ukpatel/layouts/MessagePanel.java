@@ -2,10 +2,12 @@ package com.ukpatel.layouts;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
@@ -42,8 +44,7 @@ public class MessagePanel extends JPanel {
         JPanel sendPanel = new JPanel();
         sendPanel.setLayout(new BorderLayout());
 
-        String formatedMessage = "<html><p style=\"width:150px;\">" + message.getMessage() + "</p></html>";
-        JLabel msgLabel = new JLabel(formatedMessage);
+        JLabel msgLabel = new JLabel(getFormattedMessage(message.getMessage()));
         msgLabel.setOpaque(true);
         msgLabel.setBackground(new Color(37, 211, 102));
         msgLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
@@ -72,8 +73,7 @@ public class MessagePanel extends JPanel {
         authorLabel.setFont(new Font("Time New Roman", Font.PLAIN, 11));
         receivePanel.add(authorLabel, BorderLayout.PAGE_START);
 
-        String formatedMessage = "<html><p style=\"width:150px;\">" + message.getMessage() + "</p></html>";
-        JLabel msgLabel = new JLabel(formatedMessage);
+        JLabel msgLabel = new JLabel(getFormattedMessage(message.getMessage()));
         msgLabel.setOpaque(true);
         msgLabel.setBackground(new Color(37, 211, 102));
         msgLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
@@ -88,5 +88,14 @@ public class MessagePanel extends JPanel {
         receivePanel.add(timeLabel, BorderLayout.PAGE_END);
 
         return receivePanel;
+    }
+
+    private static String getFormattedMessage(String message) {
+        StringBuilder formattedMessage = new StringBuilder();
+        formattedMessage.append("<html>").append("<body>");
+        formattedMessage.append("<p style=\"width: 280px\">");
+        formattedMessage.append(message.replaceAll("\n", "<br>"));
+        formattedMessage.append("</p>").append("</body>").append("</html>");
+        return formattedMessage.toString();
     }
 }

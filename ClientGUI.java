@@ -47,7 +47,7 @@ public class ClientGUI extends JFrame implements Runnable {
         setSize(500, 700);
         setIconImage(new ImageIcon("./assets/Chatly_logo.png").getImage());
         setLocationRelativeTo(null);
-        setResizable(false);
+        // setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("Chatly");
     }
