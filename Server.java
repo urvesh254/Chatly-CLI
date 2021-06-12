@@ -51,21 +51,35 @@ public class Server implements Runnable {
 			while (true) {
 				message = (Message) reader.readObject();
 
-				if (message.getMessageType() == Message.FILE_SEND || message.getMessageType() == Message.FILE_RECEIVE) {
-					System.out.println(message.getFile().getName());
-					continue;
-				}
-
-				if (message.getMessageType() == Message.USER_EXIT) {
+				switch (message.getMessageType()) {
+				case Message.USER_EXIT:
 					throw new Exception();
-				} else {
+				case Message.FILE_INFO_SEND:
+					break;
+				case Message.FILE_SENDING:
+					System.out.println("File Sending.");
+					break;
+				case Message.FILE_SENT:
+					System.out.println("File Sent.");
+					System.out.println(message.getFile().getName() + "File Send Info.");
+					Message msg = new Message(message.getAuthor(), Message.FILE_INFO_RECEIVE, "");
+					msg.setFile(message.getFile());
+					sendOtherClients(msg);
+					break;
+				case Message.MESSAGE_SEND:
 					System.out.println(clientName + " : " + message.getMessage());
 					sendOtherClients(new Message(clientName, Message.MESSAGE_RECEIVE, message.getMessage()));
+				case Message.FILE_INFO_RECEIVE:
+					break;
+				case Message.FILE_RECEIVING:
+					break;
+				case Message.FILE_RECEIVED:
+					break;
 				}
 			}
 
 		} catch (Exception e) {
-			System.out.println(e.toString());
+			System.out.println(e);
 			System.out.println(clientName + " left the chat.");
 			sendOtherClients(new Message("Server", Message.USER_EXIT, clientName + " left the chat."));
 		} finally {

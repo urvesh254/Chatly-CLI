@@ -110,13 +110,14 @@ public class ChatArea extends JPanel {
         validate();
     }
 
+    // Only for sending the files.
     public synchronized void addMessage(Message message, ObjectOutputStream out, int messageType) {
         MessagePanel messagePanel = new MessagePanel(message, messageType);
         vertical.add(messagePanel);
         vertical.add(Box.createVerticalStrut(10));
 
         // Sending file to server.
-        new FileSending(message.getFile(), out, messagePanel.getProgressBar());
+        new FileSending(message, out, messagePanel.getProgressBar(), false);
 
         messages.add(vertical, BorderLayout.PAGE_START);
         inputMessage.requestFocusInWindow();

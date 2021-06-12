@@ -12,17 +12,22 @@ public class Message implements Serializable {
     // Types of the messages.
     public static final int USER_JOIN = 1;
     public static final int MESSAGE_SEND = 2;
-    public static final int FILE_SEND = 3;
-    public static final int MESSAGE_RECEIVE = 4;
-    public static final int FILE_RECEIVE = 5;
-    public static final int USER_EXIT = 6;
+    public static final int MESSAGE_RECEIVE = 3;
+    public static final int USER_EXIT = 4;
+
+    public static final int FILE_INFO_SEND = 5;
+    public static final int FILE_SENDING = 6;
+    public static final int FILE_SENT = 7;
+    public static final int FILE_INFO_RECEIVE = 8;
+    public static final int FILE_RECEIVING = 9;
+    public static final int FILE_RECEIVED = 10;
 
     private int messageType;
     private String message;
     private String author;
     private String time;
 
-    private File file;
+    protected File file;
     private byte[] data;
     private int byteRead;
 

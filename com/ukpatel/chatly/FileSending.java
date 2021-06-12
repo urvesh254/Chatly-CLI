@@ -3,6 +3,7 @@ package com.ukpatel.chatly;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.ObjectOutputStream;
 
 import javax.swing.JProgressBar;
@@ -10,19 +11,27 @@ import javax.swing.JProgressBar;
 public class FileSending extends Thread {
 
     private ObjectOutputStream writer;
-    private File file;
+    private final File file;
+    private Message message;
     private JProgressBar progressBar;
+    private final int messageType;
 
     // JProgressBar, OutputStream, File
-    public FileSending(File file, ObjectOutputStream writer, JProgressBar progressBar) {
+    public FileSending(Message message, ObjectOutputStream writer, JProgressBar progressBar, boolean isServerSending) {
+        this.message = message;
+        this.file = message.getFile();
+        this.progressBar = progressBar;
+        this.writer = writer;
+        this.messageType = isServerSending ? Message.FILE_RECEIVING : Message.FILE_SENDING;
+
+        // Sending File Info.
+        Message msg = new Message(message.getAuthor(), Message.FILE_INFO_SEND, "");
+        msg.setFile(file);
         try {
-            this.file = file;
-            this.progressBar = progressBar;
-            this.writer = writer;
-        } catch (Exception e) {
-            System.out.println("in FileSending");
-            e.printStackTrace();
+            writer.writeObject(msg);
+        } catch (IOException e) {
         }
+
         this.start();
     }
 
@@ -34,9 +43,10 @@ public class FileSending extends Thread {
             long totalLen = file.length();
             long sentBytes = 0;
             byte[] data = new byte[Message.BUFFER_SIZE];
+
             while ((byteRead = reader.read(data)) != -1) {
                 sentBytes += byteRead;
-                message = new Message(file, Message.FILE_SEND, byteRead, data);
+                message = new Message(file, messageType, byteRead, data);
                 writer.writeObject(message);
                 writer.flush();
 
@@ -46,6 +56,9 @@ public class FileSending extends Thread {
                 progressBar.setValue(sent);
                 progressBar.setString(sent + "%");
             }
+            Message msg = new Message(this.message.getAuthor(), Message.FILE_SENT, "");
+            msg.setFile(file);
+            writer.writeObject(msg);
         } catch (Exception e) {
             e.printStackTrace();
         }

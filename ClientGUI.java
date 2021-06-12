@@ -134,7 +134,7 @@ public class ClientGUI extends JFrame implements Runnable {
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
                 System.out.println(file.getAbsolutePath());
-                Message message = new Message(clientName, Message.FILE_SEND, "File Sending...");
+                Message message = new Message(clientName, Message.FILE_INFO_SEND, "File Sending...");
                 message.setFile(file);
                 chatArea.addMessage(message, sender, MessagePanel.USER_SEND);
             }
@@ -222,10 +222,20 @@ public class ClientGUI extends JFrame implements Runnable {
             Message message;
             while (true) {
                 message = (Message) reader.readObject();
-                if (message.getMessageType() == Message.MESSAGE_RECEIVE)
+                switch (message.getMessageType()) {
+                case Message.MESSAGE_RECEIVE:
                     chatArea.addMessage(message, MessagePanel.USER_RECEIVE);
-                else
+                    break;
+                case Message.FILE_INFO_RECEIVE:
+                    chatArea.addMessage(message, MessagePanel.USER_RECEIVE);
+                    break;
+                case Message.FILE_RECEIVING:
+                    break;
+                case Message.FILE_RECEIVED:
+                    break;
+                default:
                     chatArea.addMessage(message, MessagePanel.USER_INFO);
+                }
             }
         } catch (SocketException e) {
             showToast("Server is closed.");

@@ -32,12 +32,12 @@ public class MessagePanel extends JPanel {
         this.setLayout(new BorderLayout());
 
         if (messageType == MessagePanel.USER_SEND) {
-            if (message.getMessageType() == Message.FILE_SEND)
+            if (message.getMessageType() == Message.FILE_INFO_SEND)
                 this.add(getFileSendPanel(), BorderLayout.LINE_END);
             else
                 this.add(getSendPanel(), BorderLayout.LINE_END);
         } else if (messageType == MessagePanel.USER_RECEIVE) {
-            if (message.getMessageType() == Message.FILE_RECEIVE)
+            if (message.getMessageType() == Message.FILE_INFO_RECEIVE)
                 this.add(getFileReceivePanel(), BorderLayout.LINE_START);
             else
                 this.add(getReceivePanel(), BorderLayout.LINE_START);
@@ -126,7 +126,8 @@ public class MessagePanel extends JPanel {
 
         JPanel centerPanel = new JPanel(new BorderLayout());
 
-        JLabel fileLabel = new JLabel(getFormattedMessage(message.getFile().getName(), 195));
+        // JLabel fileLabel = new JLabel(getFormattedMessage(message.getFile().getName(), 195));
+        JLabel fileLabel = new JLabel(getFormattedMessage(message.getFile().getName(), 236));
         fileLabel.setOpaque(true);
         fileLabel.setIcon(new ImageIcon(FILE_ICON));
         fileLabel.setBackground(new Color(37, 211, 102));
@@ -166,7 +167,7 @@ public class MessagePanel extends JPanel {
 
         JPanel centerPanel = new JPanel(new BorderLayout());
 
-        JLabel fileLabel = new JLabel(getFormattedMessage(message.getFile().getName(), 195));
+        JLabel fileLabel = new JLabel(getFormattedMessage(message.getFile().getName(), 236));
         fileLabel.setIcon(new ImageIcon(FILE_ICON));
         fileLabel.setOpaque(true);
         fileLabel.setBackground(new Color(37, 211, 102));
