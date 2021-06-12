@@ -7,6 +7,7 @@ import java.awt.Font;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
@@ -116,19 +117,27 @@ public class MessagePanel extends JPanel {
         JPanel sendPanel = new JPanel();
         sendPanel.setLayout(new BorderLayout());
 
+        JPanel centerPanel = new JPanel(new BorderLayout());
+
         JLabel fileLabel = new JLabel(getFormattedMessage(message.getFile().getName(), 195));
         fileLabel.setOpaque(true);
         fileLabel.setIcon(new ImageIcon(FILE_ICON));
         fileLabel.setBackground(new Color(37, 211, 102));
         fileLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
         fileLabel.setBorder(new EmptyBorder(10, 5, 2, 2));
-        sendPanel.add(fileLabel, BorderLayout.CENTER);
+        centerPanel.add(fileLabel, BorderLayout.CENTER);
 
         fileDownloadLabel = new JLabel(new ImageIcon(DOWNLOAD_ICON));
         fileDownloadLabel.setOpaque(true);
         fileDownloadLabel.setBorder(new EmptyBorder(2, 5, 2, 10));
         fileDownloadLabel.setBackground(new Color(37, 211, 102));
-        sendPanel.add(fileDownloadLabel, BorderLayout.EAST);
+        centerPanel.add(fileDownloadLabel, BorderLayout.EAST);
+
+        JProgressBar progressBar = new JProgressBar(0, 100);
+        progressBar.setValue(60);
+        centerPanel.add(progressBar, BorderLayout.SOUTH);
+
+        sendPanel.add(centerPanel, BorderLayout.CENTER);
 
         JLabel timeLabel = new JLabel(message.getTime(), SwingConstants.RIGHT);
         timeLabel.setOpaque(true);
@@ -152,19 +161,27 @@ public class MessagePanel extends JPanel {
         authorLabel.setFont(new Font("Time New Roman", Font.BOLD, 11));
         receivePanel.add(authorLabel, BorderLayout.PAGE_START);
 
+        JPanel centerPanel = new JPanel(new BorderLayout());
+
         JLabel fileLabel = new JLabel(getFormattedMessage(message.getFile().getName(), 195));
         fileLabel.setIcon(new ImageIcon(FILE_ICON));
         fileLabel.setOpaque(true);
         fileLabel.setBackground(new Color(37, 211, 102));
         fileLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
         fileLabel.setBorder(new EmptyBorder(2, 0, 0, 2));
-        receivePanel.add(fileLabel, BorderLayout.CENTER);
+        centerPanel.add(fileLabel, BorderLayout.CENTER);
 
         fileDownloadLabel = new JLabel(new ImageIcon(DOWNLOAD_ICON));
         fileDownloadLabel.setOpaque(true);
         fileDownloadLabel.setBorder(new EmptyBorder(2, 5, 2, 10));
         fileDownloadLabel.setBackground(new Color(37, 211, 102));
-        receivePanel.add(fileDownloadLabel, BorderLayout.EAST);
+        centerPanel.add(fileDownloadLabel, BorderLayout.EAST);
+
+        JProgressBar progressBar = new JProgressBar(0, 100);
+        progressBar.setValue(60);
+        centerPanel.add(progressBar, BorderLayout.SOUTH);
+
+        receivePanel.add(centerPanel, BorderLayout.CENTER);
 
         JLabel timeLabel = new JLabel(message.getTime(), SwingConstants.RIGHT);
         timeLabel.setOpaque(true);

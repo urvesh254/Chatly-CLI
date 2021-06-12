@@ -1,6 +1,7 @@
 import java.awt.CardLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -104,6 +105,8 @@ public class ClientGUI extends JFrame implements Runnable {
         try {
             sender.writeObject(message);
             chatArea.addMessage(message, MessagePanel.USER_SEND);
+            // chatArea.addMessage(new Message(new File("file.txt"), Message.FILE_SEND, 10, new byte[1000]),
+            //         MessagePanel.USER_SEND);
             chatArea.clearInputMessageField();
         } catch (SocketException e) {
             showToast("Server is closed.");
@@ -191,6 +194,8 @@ public class ClientGUI extends JFrame implements Runnable {
 
             Message message;
             while (true) {
+                // chatArea.addMessage(new Message(new File("file.txt"), Message.FILE_RECEIVE, 10, new byte[1000]),
+                //         MessagePanel.USER_RECEIVE);
                 message = (Message) reader.readObject();
                 if (message.getMessageType() == Message.MESSAGE_RECEIVE)
                     chatArea.addMessage(message, MessagePanel.USER_RECEIVE);
