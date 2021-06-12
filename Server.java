@@ -57,7 +57,6 @@ public class Server implements Runnable {
 				case Message.FILE_INFO_SEND:
 					break;
 				case Message.FILE_SENDING:
-					System.out.println("File Sending.");
 					break;
 				case Message.FILE_SENT:
 					System.out.println("File Sent.");

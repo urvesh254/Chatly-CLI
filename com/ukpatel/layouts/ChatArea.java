@@ -10,6 +10,8 @@ import java.awt.event.AdjustmentListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.io.ObjectOutputStream;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.swing.Box;
 import javax.swing.ImageIcon;
@@ -24,6 +26,8 @@ import com.ukpatel.chatly.FileSending;
 import com.ukpatel.chatly.Message;
 
 public class ChatArea extends JPanel {
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+
     private JPanel messages;
     private JScrollPane scrollPane;
     private Box vertical = Box.createVerticalBox();
@@ -117,7 +121,8 @@ public class ChatArea extends JPanel {
         vertical.add(Box.createVerticalStrut(10));
 
         // Sending file to server.
-        new FileSending(message, out, messagePanel.getProgressBar(), false);
+        // Sending file one at a time.
+        executorService.execute(new FileSending(message, out, messagePanel.getProgressBar(), false));
 
         messages.add(vertical, BorderLayout.PAGE_START);
         inputMessage.requestFocusInWindow();

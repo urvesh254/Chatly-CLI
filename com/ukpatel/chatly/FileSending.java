@@ -8,7 +8,7 @@ import java.io.ObjectOutputStream;
 
 import javax.swing.JProgressBar;
 
-public class FileSending extends Thread {
+public class FileSending implements Runnable {
 
     private ObjectOutputStream writer;
     private final File file;
@@ -31,8 +31,6 @@ public class FileSending extends Thread {
             writer.writeObject(msg);
         } catch (IOException e) {
         }
-
-        this.start();
     }
 
     @Override
