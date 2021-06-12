@@ -59,6 +59,10 @@ public class Message implements Serializable {
         return this.time;
     }
 
+    public void setFile(File file) {
+        this.file = file;
+    }
+
     public File getFile() {
         return this.file;
     }

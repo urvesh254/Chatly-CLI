@@ -9,14 +9,18 @@ import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.io.ObjectOutputStream;
 
 import javax.swing.Box;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import com.ukpatel.chatly.FileSending;
 import com.ukpatel.chatly.Message;
 
 public class ChatArea extends JPanel {
@@ -26,6 +30,7 @@ public class ChatArea extends JPanel {
 
     private JTextField inputMessage;
     private JButton btnSend;
+    private JLabel attachmentLabel;
 
     private Font gainFont = new Font("Tahoma", Font.PLAIN, 20);
     private Font lostFont = new Font("Tahoma", Font.ITALIC, 20);
@@ -78,10 +83,19 @@ public class ChatArea extends JPanel {
         });
         inputPanel.add(inputMessage, BorderLayout.CENTER);
 
-        btnSend = new JButton("Send");
+        // Side Button Panel.
+        JPanel btnPanel = new JPanel();
+
+        // Attachment label
+        attachmentLabel = new JLabel(new ImageIcon("assets/attachment-35.png"));
+        btnPanel.add(attachmentLabel);
+
+        // Send Button
+        btnSend = new JButton(new ImageIcon("assets/send-35.png"));
         btnSend.setFont(new Font("Tahoma", Font.BOLD, 25));
-        btnSend.setBackground(new Color(37, 211, 102));
-        inputPanel.add(btnSend, BorderLayout.LINE_END);
+        btnPanel.add(btnSend);
+
+        inputPanel.add(btnPanel, BorderLayout.LINE_END);
 
         add(inputPanel, BorderLayout.SOUTH);
     }
@@ -89,6 +103,20 @@ public class ChatArea extends JPanel {
     public synchronized void addMessage(Message message, int messageType) {
         vertical.add(new MessagePanel(message, messageType));
         vertical.add(Box.createVerticalStrut(10));
+
+        messages.add(vertical, BorderLayout.PAGE_START);
+        inputMessage.requestFocusInWindow();
+        scrollToBottom(scrollPane);
+        validate();
+    }
+
+    public synchronized void addMessage(Message message, ObjectOutputStream out, int messageType) {
+        MessagePanel messagePanel = new MessagePanel(message, messageType);
+        vertical.add(messagePanel);
+        vertical.add(Box.createVerticalStrut(10));
+
+        // Sending file to server.
+        new FileSending(message.getFile(), out, messagePanel.getProgressBar());
 
         messages.add(vertical, BorderLayout.PAGE_START);
         inputMessage.requestFocusInWindow();
@@ -111,6 +139,10 @@ public class ChatArea extends JPanel {
 
     public JButton getBtnSend() {
         return this.btnSend;
+    }
+
+    public JLabel getAttachmentLabel() {
+        return this.attachmentLabel;
     }
 
     public String getMessageText() {

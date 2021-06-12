@@ -50,6 +50,12 @@ public class Server implements Runnable {
 			Message message;
 			while (true) {
 				message = (Message) reader.readObject();
+
+				if (message.getMessageType() == Message.FILE_SEND || message.getMessageType() == Message.FILE_RECEIVE) {
+					System.out.println(message.getFile().getName());
+					continue;
+				}
+
 				if (message.getMessageType() == Message.USER_EXIT) {
 					throw new Exception();
 				} else {
@@ -59,6 +65,7 @@ public class Server implements Runnable {
 			}
 
 		} catch (Exception e) {
+			System.out.println(e.toString());
 			System.out.println(clientName + " left the chat.");
 			sendOtherClients(new Message("Server", Message.USER_EXIT, clientName + " left the chat."));
 		} finally {

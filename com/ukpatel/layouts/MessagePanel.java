@@ -3,7 +3,8 @@ package com.ukpatel.layouts;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
-
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -22,8 +23,9 @@ public class MessagePanel extends JPanel {
     public static final int USER_SEND = 1;
     public static final int USER_RECEIVE = 2;
 
-    private JLabel fileDownloadLabel;
     private Message message;
+    private JLabel fileDownloadLabel;
+    private JProgressBar progressBar;
 
     public MessagePanel(Message message, int messageType) {
         this.message = message;
@@ -47,11 +49,16 @@ public class MessagePanel extends JPanel {
     private JPanel getInfoPanel() {
         JPanel infoPanel = new JPanel();
         JLabel label = new JLabel(message.getMessage());
+        label.setFont(new Font("Tahoma", Font.BOLD, 12));
         label.setBorder(new EmptyBorder(3, 3, 3, 3));
         label.setOpaque(true);
         label.setBackground(Color.CYAN);
         infoPanel.add(label);
         return infoPanel;
+    }
+
+    public JProgressBar getProgressBar() {
+        return this.progressBar;
     }
 
     private JPanel getSendPanel() {
@@ -127,14 +134,10 @@ public class MessagePanel extends JPanel {
         fileLabel.setBorder(new EmptyBorder(10, 5, 2, 2));
         centerPanel.add(fileLabel, BorderLayout.CENTER);
 
-        fileDownloadLabel = new JLabel(new ImageIcon(DOWNLOAD_ICON));
-        fileDownloadLabel.setOpaque(true);
-        fileDownloadLabel.setBorder(new EmptyBorder(2, 5, 2, 10));
-        fileDownloadLabel.setBackground(new Color(37, 211, 102));
-        centerPanel.add(fileDownloadLabel, BorderLayout.EAST);
-
-        JProgressBar progressBar = new JProgressBar(0, 100);
-        progressBar.setValue(60);
+        progressBar = new JProgressBar(0, 100);
+        progressBar.setValue(0);
+        progressBar.setStringPainted(true);
+        progressBar.setFont(new Font("Tahoma", Font.BOLD, 12));
         centerPanel.add(progressBar, BorderLayout.SOUTH);
 
         sendPanel.add(centerPanel, BorderLayout.CENTER);
@@ -171,15 +174,24 @@ public class MessagePanel extends JPanel {
         fileLabel.setBorder(new EmptyBorder(2, 0, 0, 2));
         centerPanel.add(fileLabel, BorderLayout.CENTER);
 
+        progressBar = new JProgressBar(0, 100);
+        progressBar.setValue(0);
+        progressBar.setStringPainted(true);
+        progressBar.setFont(new Font("Tahoma", Font.BOLD, 12));
+
         fileDownloadLabel = new JLabel(new ImageIcon(DOWNLOAD_ICON));
         fileDownloadLabel.setOpaque(true);
         fileDownloadLabel.setBorder(new EmptyBorder(2, 5, 2, 10));
         fileDownloadLabel.setBackground(new Color(37, 211, 102));
+        fileDownloadLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                centerPanel.add(progressBar, BorderLayout.SOUTH);
+                centerPanel.validate();
+                fileDownloadLabel.removeMouseListener(this);
+            }
+        });
         centerPanel.add(fileDownloadLabel, BorderLayout.EAST);
-
-        JProgressBar progressBar = new JProgressBar(0, 100);
-        progressBar.setValue(60);
-        centerPanel.add(progressBar, BorderLayout.SOUTH);
 
         receivePanel.add(centerPanel, BorderLayout.CENTER);
 

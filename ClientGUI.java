@@ -1,6 +1,8 @@
 import java.awt.CardLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -12,8 +14,10 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 
 import com.ukpatel.chatly.Message;
 import com.ukpatel.layouts.ChatArea;
@@ -36,6 +40,9 @@ public class ClientGUI extends JFrame implements Runnable {
     public ClientGUI() {
         card = new CardLayout();
         this.setLayout(card);
+
+        // Setting Look and Feel of the frame.
+        setLookAndFeel();
 
         infoPanel = new InfoPanel();
         add(infoPanel, "infoPanel");
@@ -87,6 +94,12 @@ public class ClientGUI extends JFrame implements Runnable {
 
         });
 
+        chatArea.getAttachmentLabel().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                sendFile();
+            }
+        });
     }
 
     private void connectToServer() {
@@ -105,13 +118,27 @@ public class ClientGUI extends JFrame implements Runnable {
         try {
             sender.writeObject(message);
             chatArea.addMessage(message, MessagePanel.USER_SEND);
-            // chatArea.addMessage(new Message(new File("file.txt"), Message.FILE_SEND, 10, new byte[1000]),
-            //         MessagePanel.USER_SEND);
             chatArea.clearInputMessageField();
         } catch (SocketException e) {
             showToast("Server is closed.");
         } catch (Exception e) {
             showToast("Some problem in connection. \nRestart the application and reconnect to ther server.");
+        }
+    }
+
+    private void sendFile() {
+        try {
+            String path = "E:/Urvesh/Learning Tutorials/ICE GATE Lectures/DMGT/";
+            JFileChooser fileChooser = new JFileChooser(path);
+            int returnVal = fileChooser.showOpenDialog(this);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                System.out.println(file.getAbsolutePath());
+                Message message = new Message(clientName, Message.FILE_SEND, "File Sending...");
+                message.setFile(file);
+                chatArea.addMessage(message, sender, MessagePanel.USER_SEND);
+            }
+        } catch (Exception e) {
         }
     }
 
@@ -194,8 +221,6 @@ public class ClientGUI extends JFrame implements Runnable {
 
             Message message;
             while (true) {
-                // chatArea.addMessage(new Message(new File("file.txt"), Message.FILE_RECEIVE, 10, new byte[1000]),
-                //         MessagePanel.USER_RECEIVE);
                 message = (Message) reader.readObject();
                 if (message.getMessageType() == Message.MESSAGE_RECEIVE)
                     chatArea.addMessage(message, MessagePanel.USER_RECEIVE);
@@ -208,6 +233,16 @@ public class ClientGUI extends JFrame implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
             showToast("Some problem in connection. \nRestart the application and reconnect to ther server.");
+        }
+    }
+
+    private void setLookAndFeel() {
+        try {
+            String lookAndFeel = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+            UIManager.setLookAndFeel(lookAndFeel);
+        } catch (Exception e) {
+            e.printStackTrace();
+
         }
     }
 }
