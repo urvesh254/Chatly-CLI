@@ -3,7 +3,6 @@ package com.ukpatel.chatly;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.ObjectOutputStream;
 
 import javax.swing.JProgressBar;
@@ -11,26 +10,28 @@ import javax.swing.JProgressBar;
 public class FileSending implements Runnable {
 
     private ObjectOutputStream writer;
-    private final File file;
+    private File file;
     private Message message;
     private JProgressBar progressBar;
-    private final int messageType;
+    private int messageType;
+    private boolean isServerSending = false;
 
-    // JProgressBar, OutputStream, File
-    public FileSending(Message message, ObjectOutputStream writer, JProgressBar progressBar, boolean isServerSending) {
+    // For Client
+    public FileSending(Message message, ObjectOutputStream writer, JProgressBar progressBar) {
         this.message = message;
         this.file = message.getFile();
         this.progressBar = progressBar;
         this.writer = writer;
-        this.messageType = isServerSending ? Message.FILE_RECEIVING : Message.FILE_SENDING;
+        this.messageType = Message.FILE_SENDING;
+    }
 
-        // Sending File Info.
-        Message msg = new Message(message.getAuthor(), Message.FILE_INFO_SEND, "");
-        msg.setFile(file);
-        try {
-            writer.writeObject(msg);
-        } catch (IOException e) {
-        }
+    // For Server.
+    public FileSending(Message message, File file, ObjectOutputStream writer) {
+        this.message = message;
+        this.file = file;
+        this.writer = writer;
+        this.isServerSending = true;
+        this.messageType = Message.FILE_RECEIVING;
     }
 
     @Override
@@ -40,29 +41,36 @@ public class FileSending implements Runnable {
         long totalLen = file.length();
         long sentBytes = 0;
         byte[] data = new byte[Message.BUFFER_SIZE];
+        int infoType;
+
         try (DataInputStream reader = new DataInputStream(new FileInputStream(file))) {
             // Sending File Info.
-            rMessage = new Message(message.getAuthor(), Message.FILE_INFO_SEND, "");
-            rMessage.setFile(file);
+            infoType = isServerSending ? Message.FILE_INFO_RECEIVE : Message.FILE_INFO_SEND;
+            rMessage = new Message(message.getAuthor(), infoType, "");
+            rMessage.setFile(message.getFile());
             writer.writeObject(rMessage);
 
             // Sending file data to server.
             while ((byteRead = reader.read(data)) != -1) {
                 sentBytes += byteRead;
-                rMessage = new Message(file, messageType, byteRead, data);
+                System.out.println(byteRead);
+                rMessage = new Message(message.getFile(), messageType, byteRead, data);
                 writer.writeObject(rMessage);
                 writer.flush();
 
-                int sent = (int) ((sentBytes * 100) / totalLen);
+                if (!isServerSending) {
+                    int sent = (int) ((sentBytes * 100) / totalLen);
 
-                // Setting Progressbar value.
-                progressBar.setValue(sent);
-                progressBar.setString(sent + "%");
+                    // Setting Progressbar value.
+                    progressBar.setValue(sent);
+                    progressBar.setString(sent + "%");
+                }
             }
 
             // Nofifing the file sending is done.
-            rMessage = new Message(this.message.getAuthor(), Message.FILE_SENT, "");
-            rMessage.setFile(file);
+            infoType = isServerSending ? Message.FILE_RECEIVED : Message.FILE_SENT;
+            rMessage = new Message(this.message.getAuthor(), infoType, "");
+            rMessage.setFile(message.getFile());
             writer.writeObject(rMessage);
         } catch (Exception e) {
             e.printStackTrace();

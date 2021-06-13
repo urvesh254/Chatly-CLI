@@ -3,7 +3,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -25,6 +27,7 @@ import com.ukpatel.layouts.InfoPanel;
 import com.ukpatel.layouts.MessagePanel;
 
 public class ClientGUI extends JFrame implements Runnable {
+    private static final String CLIENT_DATA_PARENT_DIRECTORY = "Chatly_Client_Data";
 
     private ChatArea chatArea;
     private InfoPanel infoPanel;
@@ -117,6 +120,7 @@ public class ClientGUI extends JFrame implements Runnable {
         Message message = new Message(clientName, Message.MESSAGE_SEND, messageText);
         try {
             sender.writeObject(message);
+            sender.flush();
             chatArea.addMessage(message, MessagePanel.USER_SEND);
             chatArea.clearInputMessageField();
         } catch (SocketException e) {
@@ -205,6 +209,13 @@ public class ClientGUI extends JFrame implements Runnable {
 
     public static void main(String[] args) {
         try {
+            // Initializing Client Data Directory.
+            File directory = new File(CLIENT_DATA_PARENT_DIRECTORY);
+            if (!directory.exists()) {
+                directory.mkdir();
+            }
+
+            // Showing GUI
             new ClientGUI().setVisible(true);
         } catch (Exception e) {
             e.printStackTrace();
@@ -226,12 +237,17 @@ public class ClientGUI extends JFrame implements Runnable {
                 case Message.MESSAGE_RECEIVE:
                     chatArea.addMessage(message, MessagePanel.USER_RECEIVE);
                     break;
+                case Message.FILE_INFO:
+                    chatArea.addMessage(message, sender, MessagePanel.USER_RECEIVE);
+                    break;
                 case Message.FILE_INFO_RECEIVE:
-                    chatArea.addMessage(message, MessagePanel.USER_RECEIVE);
+                    fileInfoReceiveAction(message);
                     break;
                 case Message.FILE_RECEIVING:
+                    fileReceivingAction(message);
                     break;
                 case Message.FILE_RECEIVED:
+                    fileReceivedAction(message);
                     break;
                 default:
                     chatArea.addMessage(message, MessagePanel.USER_INFO);
@@ -244,6 +260,39 @@ public class ClientGUI extends JFrame implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
             showToast("Some problem in connection. \nRestart the application and reconnect to ther server.");
+        }
+    }
+
+    private DataOutputStream fileOut = null;
+
+    private void fileInfoReceiveAction(Message message) {
+        try {
+            String fileName = message.getFile().getName();
+            System.out.println(fileName);
+            File file = new File(CLIENT_DATA_PARENT_DIRECTORY, fileName);
+            fileOut = new DataOutputStream(new FileOutputStream(file));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void fileReceivingAction(Message message) {
+        try {
+            fileOut.write(message.getData(), 0, message.getByteRead());
+            fileOut.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void fileReceivedAction(Message message) {
+        // Closing the fileOut
+        if (fileOut != null) {
+            try {
+                fileOut.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

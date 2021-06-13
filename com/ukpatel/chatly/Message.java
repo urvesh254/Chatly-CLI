@@ -7,7 +7,8 @@ import java.util.Date;
 
 public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
-    public static final int BUFFER_SIZE = 8192;
+    // public static final int BUFFER_SIZE = 8192;
+    public static final int BUFFER_SIZE = 65536;
 
     // Types of the messages.
     public static final int USER_JOIN = 1;
@@ -21,6 +22,7 @@ public class Message implements Serializable {
     public static final int FILE_INFO_RECEIVE = 8;
     public static final int FILE_RECEIVING = 9;
     public static final int FILE_RECEIVED = 10;
+    public static final int FILE_INFO = 11;
 
     private int messageType;
     private String message;

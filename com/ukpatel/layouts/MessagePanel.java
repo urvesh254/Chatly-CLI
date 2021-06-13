@@ -37,7 +37,7 @@ public class MessagePanel extends JPanel {
             else
                 this.add(getSendPanel(), BorderLayout.LINE_END);
         } else if (messageType == MessagePanel.USER_RECEIVE) {
-            if (message.getMessageType() == Message.FILE_INFO_RECEIVE)
+            if (message.getMessageType() == Message.FILE_INFO)
                 this.add(getFileReceivePanel(), BorderLayout.LINE_START);
             else
                 this.add(getReceivePanel(), BorderLayout.LINE_START);
@@ -55,10 +55,6 @@ public class MessagePanel extends JPanel {
         label.setBackground(Color.CYAN);
         infoPanel.add(label);
         return infoPanel;
-    }
-
-    public JProgressBar getProgressBar() {
-        return this.progressBar;
     }
 
     private JPanel getSendPanel() {
@@ -189,7 +185,7 @@ public class MessagePanel extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 centerPanel.add(progressBar, BorderLayout.SOUTH);
                 centerPanel.validate();
-                fileDownloadLabel.removeMouseListener(this);
+                System.out.println("inside messagePanel");
             }
         });
         centerPanel.add(fileDownloadLabel, BorderLayout.EAST);
@@ -204,5 +200,13 @@ public class MessagePanel extends JPanel {
         receivePanel.add(timeLabel, BorderLayout.PAGE_END);
 
         return receivePanel;
+    }
+
+    public JProgressBar getProgressBar() {
+        return this.progressBar;
+    }
+
+    public JLabel getFileDownloadLabel() {
+        return this.fileDownloadLabel;
     }
 }

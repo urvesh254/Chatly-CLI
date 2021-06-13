@@ -1,5 +1,4 @@
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -13,24 +12,30 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import com.ukpatel.chatly.FileSending;
 import com.ukpatel.chatly.Message;
 
 public class Server implements Runnable {
 	private static final ArrayList<ObjectOutputStream> clientsOutputStreams = new ArrayList<>();
 	private static final ArrayList<ObjectInputStream> clientsInputStreams = new ArrayList<>();
-	private static final String DATA_PARENT_DIRECTORY = "Chatly_Server_Data";
+	private static final String SERVER_DATA_PARENT_DIRECTORY = "Chatly_Server_Data";
 	private static final String SERVER_FILE_EXTENSION = "chatly.filedata";
+	private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 	private static int PORT;
 	private static String HOST_NAME;
 	private static String HOST_ADDRESS;
+	private Socket socket;
 	private Thread readerThread;
 	private String clientName;
 	private ObjectOutputStream writer;
 	private ObjectInputStream reader;
 
 	public Server(Socket socket) {
+		this.socket = socket;
 		readerThread = new Thread(this);
 		try {
 			this.writer = new ObjectOutputStream(socket.getOutputStream());
@@ -61,8 +66,7 @@ public class Server implements Runnable {
 				case Message.USER_EXIT:
 					throw new Exception();
 				case Message.FILE_INFO_SEND:
-					initializeFileStream(message);
-					System.out.println(message.getFile().getName() + "File Send Info.");
+					fileInfoSendAction(message);
 					break;
 				case Message.FILE_SENDING:
 					fileSendingAction(message);
@@ -70,14 +74,12 @@ public class Server implements Runnable {
 				case Message.FILE_SENT:
 					fileSentAction(message);
 					break;
+				case Message.FILE_INFO_RECEIVE:
+					fileInfoReceiveAction(message);
+					break;
 				case Message.MESSAGE_SEND:
 					System.out.println(clientName + " : " + message.getMessage());
 					sendOtherClients(new Message(clientName, Message.MESSAGE_RECEIVE, message.getMessage()));
-				case Message.FILE_INFO_RECEIVE:
-					break;
-				case Message.FILE_RECEIVING:
-					break;
-				case Message.FILE_RECEIVED:
 					break;
 				default:
 					System.out.println(message + " " + message.getMessageType());
@@ -86,9 +88,14 @@ public class Server implements Runnable {
 
 		} catch (Exception e) {
 			System.out.println(e);
+			e.printStackTrace();
 			System.out.println(clientName + " left the chat.");
 			sendOtherClients(new Message("Server", Message.USER_EXIT, clientName + " left the chat."));
 		} finally {
+			try {
+				socket.close();
+			} catch (Exception e) {
+			}
 			clientsOutputStreams.remove(writer);
 			clientsInputStreams.remove(reader);
 		}
@@ -96,11 +103,17 @@ public class Server implements Runnable {
 
 	private DataOutputStream fileOut = null;
 
-	private void initializeFileStream(Message message) {
+	private String getServerFileName(Message message) {
+		String fileName = String.format("%s_%s_%s.%s", message.getFile().getName(), message.getAuthor(),
+				message.getTime().replace(":", ""), SERVER_FILE_EXTENSION);
+		return fileName;
+	}
+
+	private void fileInfoSendAction(Message message) {
 		try {
-			String fileName = String.format("%s_%s_%s.%s", message.getFile().getName(), message.getAuthor(),
-					message.getTime().replace(":", ""), SERVER_FILE_EXTENSION);
-			File file = new File(DATA_PARENT_DIRECTORY, fileName);
+			// String fileName = getServerFileName(message);
+			String fileName = message.getFile().getName();
+			File file = new File(SERVER_DATA_PARENT_DIRECTORY, fileName);
 			fileOut = new DataOutputStream(new FileOutputStream(file));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -109,6 +122,7 @@ public class Server implements Runnable {
 
 	private void fileSendingAction(Message message) {
 		try {
+			System.out.println(message.getByteRead());
 			fileOut.write(message.getData(), 0, message.getByteRead());
 			fileOut.flush();
 		} catch (Exception e) {
@@ -117,7 +131,6 @@ public class Server implements Runnable {
 	}
 
 	private void fileSentAction(Message message) {
-		System.out.println("File Sent.");
 		// Closing the fileOut
 		if (fileOut != null) {
 			try {
@@ -130,9 +143,19 @@ public class Server implements Runnable {
 		System.out.println(String.format("%s sent the %s file.", message.getAuthor(), message.getFile().getName()));
 
 		// Sending other client to file info.
-		Message msg = new Message(message.getAuthor(), Message.FILE_INFO_RECEIVE, "");
+		Message msg = new Message(message.getAuthor(), Message.FILE_INFO, "");
 		msg.setFile(message.getFile());
 		sendOtherClients(msg);
+	}
+
+	private void fileInfoReceiveAction(Message message) {
+		// System.out.println(getServerFileName(message));
+		// File file = new File(SERVER_DATA_PARENT_DIRECTORY, getServerFileName(message));
+		System.out.println(message.getFile().getName());
+		File file = new File(SERVER_DATA_PARENT_DIRECTORY, message.getFile().getName());
+		Message msgSend = new Message(message.getAuthor(), Message.FILE_INFO_RECEIVE, "");
+		msgSend.setFile(message.getFile());
+		executorService.execute(new FileSending(msgSend, file, writer));
 	}
 
 	private void sendOtherClients(Message message) {
@@ -143,6 +166,7 @@ public class Server implements Runnable {
 				}
 				try {
 					clientWriter.writeObject(message);
+					clientWriter.flush();
 				} catch (SocketException e) {
 				}
 			}
@@ -159,8 +183,10 @@ public class Server implements Runnable {
 			HOST_ADDRESS = InetAddress.getLocalHost().getHostAddress();
 
 			// Initializing Server Data Directory.
-			File directory = new File(DATA_PARENT_DIRECTORY);
-			if (!directory.exists()) {
+			File directory = new File(SERVER_DATA_PARENT_DIRECTORY);
+			if (directory.exists()) {
+				deletePreviousFiles(directory);
+			} else {
 				directory.mkdir();
 			}
 
@@ -194,6 +220,13 @@ public class Server implements Runnable {
 					System.out.println(e.getMessage());
 				}
 			}
+		}
+	}
+
+	private static void deletePreviousFiles(File directory) {
+		File[] files = directory.listFiles();
+		for (File file : files) {
+			file.delete();
 		}
 	}
 }

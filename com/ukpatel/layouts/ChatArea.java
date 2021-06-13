@@ -7,9 +7,13 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -27,6 +31,7 @@ import com.ukpatel.chatly.Message;
 
 public class ChatArea extends JPanel {
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private HashMap<JLabel, Message> fileMap = new HashMap<>();
 
     private JPanel messages;
     private JScrollPane scrollPane;
@@ -114,25 +119,46 @@ public class ChatArea extends JPanel {
         validate();
     }
 
-    // Remove all message from panel.
-    public void removeAllMessages() {
-        vertical.removeAll();
-    }
-
     // Only for sending the files.
     public synchronized void addMessage(Message message, ObjectOutputStream out, int messageType) {
         MessagePanel messagePanel = new MessagePanel(message, messageType);
         vertical.add(messagePanel);
         vertical.add(Box.createVerticalStrut(10));
 
-        // Sending file to server.
-        // Sending file one at a time.
-        executorService.execute(new FileSending(message, out, messagePanel.getProgressBar(), false));
+        if (message.getMessageType() == Message.FILE_INFO) {
+            JLabel downLabel = messagePanel.getFileDownloadLabel();
+            if (downLabel != null) {
+                fileMap.put(downLabel, message);
+                downLabel.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        JLabel downLabel = (JLabel) e.getSource();
+                        Message msg = fileMap.get(downLabel);
+                        Message requestFile = new Message(msg.getAuthor(), Message.FILE_INFO_RECEIVE, "");
+                        requestFile.setFile(msg.getFile());
+                        System.out.println(msg.getFile() + ", " + msg.getAuthor() + ", " + msg.getTime());
+                        try {
+                            out.writeObject(requestFile);
+                        } catch (IOException e1) {
+                        }
+                    }
+                });
+            }
+        } else {
+            // Sending file to server.
+            // Sending file one at a time.
+            executorService.execute(new FileSending(message, out, messagePanel.getProgressBar()));
+        }
 
         messages.add(vertical, BorderLayout.PAGE_START);
         inputMessage.requestFocusInWindow();
         scrollToBottom(scrollPane);
         validate();
+    }
+
+    // Remove all message from panel.
+    public void removeAllMessages() {
+        vertical.removeAll();
     }
 
     private void scrollToBottom(JScrollPane scrollPane) {
