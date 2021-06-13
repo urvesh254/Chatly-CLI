@@ -239,6 +239,7 @@ public class ClientGUI extends JFrame implements Runnable {
             }
         } catch (SocketException e) {
             showToast("Server is closed.");
+            chatArea.removeAllMessages();
             card.show(getContentPane(), "infoPanel");
         } catch (Exception e) {
             e.printStackTrace();

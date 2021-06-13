@@ -1,4 +1,8 @@
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
@@ -13,8 +17,10 @@ import java.util.ArrayList;
 import com.ukpatel.chatly.Message;
 
 public class Server implements Runnable {
-	private static ArrayList<ObjectOutputStream> clientsOutputStreams = new ArrayList<>();
-	private static ArrayList<ObjectInputStream> clientsInputStreams = new ArrayList<>();
+	private static final ArrayList<ObjectOutputStream> clientsOutputStreams = new ArrayList<>();
+	private static final ArrayList<ObjectInputStream> clientsInputStreams = new ArrayList<>();
+	private static final String DATA_PARENT_DIRECTORY = "Chatly_Server_Data";
+	private static final String SERVER_FILE_EXTENSION = "chatly.filedata";
 
 	private static int PORT;
 	private static String HOST_NAME;
@@ -55,15 +61,14 @@ public class Server implements Runnable {
 				case Message.USER_EXIT:
 					throw new Exception();
 				case Message.FILE_INFO_SEND:
+					initializeFileStream(message);
+					System.out.println(message.getFile().getName() + "File Send Info.");
 					break;
 				case Message.FILE_SENDING:
+					fileSendingAction(message);
 					break;
 				case Message.FILE_SENT:
-					System.out.println("File Sent.");
-					System.out.println(message.getFile().getName() + "File Send Info.");
-					Message msg = new Message(message.getAuthor(), Message.FILE_INFO_RECEIVE, "");
-					msg.setFile(message.getFile());
-					sendOtherClients(msg);
+					fileSentAction(message);
 					break;
 				case Message.MESSAGE_SEND:
 					System.out.println(clientName + " : " + message.getMessage());
@@ -74,6 +79,8 @@ public class Server implements Runnable {
 					break;
 				case Message.FILE_RECEIVED:
 					break;
+				default:
+					System.out.println(message + " " + message.getMessageType());
 				}
 			}
 
@@ -85,6 +92,47 @@ public class Server implements Runnable {
 			clientsOutputStreams.remove(writer);
 			clientsInputStreams.remove(reader);
 		}
+	}
+
+	private DataOutputStream fileOut = null;
+
+	private void initializeFileStream(Message message) {
+		try {
+			String fileName = String.format("%s_%s_%s.%s", message.getFile().getName(), message.getAuthor(),
+					message.getTime().replace(":", ""), SERVER_FILE_EXTENSION);
+			File file = new File(DATA_PARENT_DIRECTORY, fileName);
+			fileOut = new DataOutputStream(new FileOutputStream(file));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void fileSendingAction(Message message) {
+		try {
+			fileOut.write(message.getData(), 0, message.getByteRead());
+			fileOut.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void fileSentAction(Message message) {
+		System.out.println("File Sent.");
+		// Closing the fileOut
+		if (fileOut != null) {
+			try {
+				fileOut.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		System.out.println(String.format("%s sent the %s file.", message.getAuthor(), message.getFile().getName()));
+
+		// Sending other client to file info.
+		Message msg = new Message(message.getAuthor(), Message.FILE_INFO_RECEIVE, "");
+		msg.setFile(message.getFile());
+		sendOtherClients(msg);
 	}
 
 	private void sendOtherClients(Message message) {
@@ -109,6 +157,12 @@ public class Server implements Runnable {
 
 			HOST_NAME = InetAddress.getLocalHost().getHostName();
 			HOST_ADDRESS = InetAddress.getLocalHost().getHostAddress();
+
+			// Initializing Server Data Directory.
+			File directory = new File(DATA_PARENT_DIRECTORY);
+			if (!directory.exists()) {
+				directory.mkdir();
+			}
 
 			System.out.print("Port For Server (Default 54321) : ");
 			try {

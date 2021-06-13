@@ -35,17 +35,22 @@ public class FileSending implements Runnable {
 
     @Override
     public void run() {
+        Message rMessage;
+        int byteRead;
+        long totalLen = file.length();
+        long sentBytes = 0;
+        byte[] data = new byte[Message.BUFFER_SIZE];
         try (DataInputStream reader = new DataInputStream(new FileInputStream(file))) {
-            Message message;
-            int byteRead;
-            long totalLen = file.length();
-            long sentBytes = 0;
-            byte[] data = new byte[Message.BUFFER_SIZE];
+            // Sending File Info.
+            rMessage = new Message(message.getAuthor(), Message.FILE_INFO_SEND, "");
+            rMessage.setFile(file);
+            writer.writeObject(rMessage);
 
+            // Sending file data to server.
             while ((byteRead = reader.read(data)) != -1) {
                 sentBytes += byteRead;
-                message = new Message(file, messageType, byteRead, data);
-                writer.writeObject(message);
+                rMessage = new Message(file, messageType, byteRead, data);
+                writer.writeObject(rMessage);
                 writer.flush();
 
                 int sent = (int) ((sentBytes * 100) / totalLen);
@@ -54,9 +59,11 @@ public class FileSending implements Runnable {
                 progressBar.setValue(sent);
                 progressBar.setString(sent + "%");
             }
-            Message msg = new Message(this.message.getAuthor(), Message.FILE_SENT, "");
-            msg.setFile(file);
-            writer.writeObject(msg);
+
+            // Nofifing the file sending is done.
+            rMessage = new Message(this.message.getAuthor(), Message.FILE_SENT, "");
+            rMessage.setFile(file);
+            writer.writeObject(rMessage);
         } catch (Exception e) {
             e.printStackTrace();
         }
