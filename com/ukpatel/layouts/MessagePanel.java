@@ -139,12 +139,21 @@ public class MessagePanel extends JPanel {
 
         sendPanel.add(centerPanel, BorderLayout.CENTER);
 
-        JLabel timeLabel = new JLabel(message.getTime(), SwingConstants.RIGHT);
-        timeLabel.setOpaque(true);
-        timeLabel.setBackground(new Color(37, 211, 102));
+        // Bottom Pannel.
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel.setBackground(new Color(37, 211, 102));
+
+        JLabel fileSize = new JLabel(getFileSize(message.getFile().length()), SwingConstants.RIGHT);
+        fileSize.setBorder(new EmptyBorder(2, 2, 2, 0));
+        fileSize.setFont(new Font("Time New Roman", Font.PLAIN, 11));
+        bottomPanel.add(fileSize, BorderLayout.LINE_START);
+
+        JLabel timeLabel = new JLabel("12:05 PM", SwingConstants.RIGHT);
         timeLabel.setBorder(new EmptyBorder(0, 0, 2, 2));
         timeLabel.setFont(new Font("Time New Roman", Font.PLAIN, 11));
-        sendPanel.add(timeLabel, BorderLayout.PAGE_END);
+        bottomPanel.add(timeLabel, BorderLayout.LINE_END);
+
+        sendPanel.add(bottomPanel, BorderLayout.SOUTH);
 
         return sendPanel;
     }
@@ -192,12 +201,21 @@ public class MessagePanel extends JPanel {
 
         receivePanel.add(centerPanel, BorderLayout.CENTER);
 
-        JLabel timeLabel = new JLabel(message.getTime(), SwingConstants.RIGHT);
-        timeLabel.setOpaque(true);
+        // Bottom Pannel.
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel.setBackground(new Color(37, 211, 102));
+
+        JLabel fileSize = new JLabel(getFileSize(message.getFile().length()), SwingConstants.RIGHT);
+        fileSize.setBorder(new EmptyBorder(2, 2, 2, 0));
+        fileSize.setFont(new Font("Time New Roman", Font.PLAIN, 11));
+        bottomPanel.add(fileSize, BorderLayout.LINE_START);
+
+        JLabel timeLabel = new JLabel("12:05 PM", SwingConstants.RIGHT);
         timeLabel.setBorder(new EmptyBorder(0, 0, 2, 2));
-        timeLabel.setBackground(new Color(37, 211, 102));
         timeLabel.setFont(new Font("Time New Roman", Font.PLAIN, 11));
-        receivePanel.add(timeLabel, BorderLayout.PAGE_END);
+        bottomPanel.add(timeLabel, BorderLayout.LINE_END);
+
+        receivePanel.add(bottomPanel, BorderLayout.SOUTH);
 
         return receivePanel;
     }
@@ -208,5 +226,23 @@ public class MessagePanel extends JPanel {
 
     public JLabel getFileDownloadLabel() {
         return this.fileDownloadLabel;
+    }
+
+    private String getFileSize(long fileSize) {
+        String s = String.valueOf(fileSize);
+        int len = s.length();
+        String ch = "";
+        float size = 0;
+        if (len > 9) {
+            ch = "G";
+            size = (float) fileSize / 1000000000;
+        } else if (len > 6) {
+            ch = "M";
+            size = (float) fileSize / 1000000;
+        } else if (len > 3) {
+            ch = "K";
+            size = (float) fileSize / 1000;
+        }
+        return String.format("%.2f %sB", size, ch);
     }
 }
