@@ -1,5 +1,5 @@
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -22,8 +22,8 @@ import com.ukpatel.chatly.Message;
 public class Server implements Runnable {
 	private static final ArrayList<ObjectOutputStream> clientsOutputStreams = new ArrayList<>();
 	private static final ArrayList<ObjectInputStream> clientsInputStreams = new ArrayList<>();
-	private static final String SERVER_DATA_PARENT_DIRECTORY = "Chatly_Server_Data";
-	private static final String SERVER_FILE_EXTENSION = "chatly.filedata";
+	public static final String SERVER_DATA_PARENT_DIRECTORY = "Chatly_Server_Data";
+	public static final String SERVER_FILE_EXTENSION = "chatly.filedata";
 	private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 	private static int PORT;
@@ -66,13 +66,14 @@ public class Server implements Runnable {
 				case Message.USER_EXIT:
 					throw new Exception();
 				case Message.FILE_INFO_SEND:
+					fileSendMsg = message;
 					fileInfoSendAction(message);
 					break;
 				case Message.FILE_SENDING:
 					fileSendingAction(message);
 					break;
 				case Message.FILE_SENT:
-					fileSentAction(message);
+					fileSentAction(fileSendMsg);
 					break;
 				case Message.FILE_INFO_RECEIVE:
 					fileInfoReceiveAction(message);
@@ -89,7 +90,6 @@ public class Server implements Runnable {
 
 		} catch (Exception e) {
 			System.out.println(e);
-			e.printStackTrace();
 			System.out.println(clientName + " left the chat.");
 			sendOtherClients(new Message("Server", Message.USER_EXIT, clientName + " left the chat."));
 		} finally {
@@ -103,7 +103,8 @@ public class Server implements Runnable {
 	}
 
 	// private BufferedOutputStream fileOut = null;
-	private DataOutputStream fileOut = null;
+	private BufferedOutputStream fileOut = null;
+	private Message fileSendMsg = null;
 
 	private String getServerFileName(Message message) {
 		String time = Message.FILE_INFO_SEND == message.getMessageType() ? message.getTime() : message.getMessage();
@@ -115,9 +116,8 @@ public class Server implements Runnable {
 	private void fileInfoSendAction(Message message) {
 		try {
 			String fileName = getServerFileName(message);
-			// String fileName = message.getFile().getName();
 			File file = new File(SERVER_DATA_PARENT_DIRECTORY, fileName);
-			fileOut = new DataOutputStream(new FileOutputStream(file));
+			fileOut = new BufferedOutputStream(new FileOutputStream(file));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -148,11 +148,11 @@ public class Server implements Runnable {
 		// Sending other client to file info.
 		Message msg = new Message(message.getAuthor(), Message.FILE_INFO, "");
 		msg.setFile(message.getFile());
+		msg.setTime(message.getTime());
 		sendOtherClients(msg);
 	}
 
 	private void fileInfoReceiveAction(Message message) {
-		System.out.println(getServerFileName(message));
 		File file = new File(SERVER_DATA_PARENT_DIRECTORY, getServerFileName(message));
 		Message msgSend = new Message(message.getAuthor(), Message.FILE_INFO_RECEIVE, "");
 		msgSend.setFile(message.getFile());

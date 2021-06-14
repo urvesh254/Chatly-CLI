@@ -7,16 +7,15 @@ import java.util.Date;
 
 public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
-    // public static final int BUFFER_SIZE = 8192;
-    // public static final int BUFFER_SIZE = 16384;
-    public static final int BUFFER_SIZE = 65536;
+    // Sending or Receving Buffere Size.
+    // 8192, 16384, 65536
+    public static final int BUFFER_SIZE = 16384;
 
     // Types of the messages.
     public static final int USER_JOIN = 1;
     public static final int MESSAGE_SEND = 2;
     public static final int MESSAGE_RECEIVE = 3;
     public static final int USER_EXIT = 4;
-
     public static final int FILE_INFO_SEND = 5;
     public static final int FILE_SENDING = 6;
     public static final int FILE_SENT = 7;
@@ -59,16 +58,16 @@ public class Message implements Serializable {
         return this.messageType;
     }
 
-    public void setMessage(String msgText) {
-        this.message = msgText;
-    }
-
     public String getMessage() {
         return this.message;
     }
 
     public String getTime() {
         return this.time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 
     public void setFile(File file) {
