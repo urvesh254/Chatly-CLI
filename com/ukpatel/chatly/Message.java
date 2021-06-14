@@ -8,6 +8,7 @@ import java.util.Date;
 public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
     // public static final int BUFFER_SIZE = 8192;
+    // public static final int BUFFER_SIZE = 16384;
     public static final int BUFFER_SIZE = 65536;
 
     // Types of the messages.
@@ -30,7 +31,7 @@ public class Message implements Serializable {
     private String time;
 
     protected File file;
-    private byte[] data;
+    private Byte[] data;
     private int byteRead;
 
     // String Message
@@ -42,7 +43,7 @@ public class Message implements Serializable {
     }
 
     // File Send or Receive.
-    public Message(File file, int messageType, int byteRead, byte[] data) {
+    public Message(File file, int messageType, int byteRead, Byte[] data) {
         this.file = file;
         this.messageType = messageType;
         this.data = data;
@@ -56,6 +57,10 @@ public class Message implements Serializable {
 
     public int getMessageType() {
         return this.messageType;
+    }
+
+    public void setMessage(String msgText) {
+        this.message = msgText;
     }
 
     public String getMessage() {
@@ -74,7 +79,7 @@ public class Message implements Serializable {
         return this.file;
     }
 
-    public byte[] getData() {
+    public Byte[] getData() {
         return this.data;
     }
 

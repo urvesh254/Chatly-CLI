@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.ukpatel.chatly.ArraysUtils;
 import com.ukpatel.chatly.FileSending;
 import com.ukpatel.chatly.Message;
 
@@ -61,7 +62,6 @@ public class Server implements Runnable {
 			Message message;
 			while (true) {
 				message = (Message) reader.readObject();
-
 				switch (message.getMessageType()) {
 				case Message.USER_EXIT:
 					throw new Exception();
@@ -84,6 +84,7 @@ public class Server implements Runnable {
 				default:
 					System.out.println(message + " " + message.getMessageType());
 				}
+
 			}
 
 		} catch (Exception e) {
@@ -101,18 +102,20 @@ public class Server implements Runnable {
 		}
 	}
 
+	// private BufferedOutputStream fileOut = null;
 	private DataOutputStream fileOut = null;
 
 	private String getServerFileName(Message message) {
+		String time = Message.FILE_INFO_SEND == message.getMessageType() ? message.getTime() : message.getMessage();
 		String fileName = String.format("%s_%s_%s.%s", message.getFile().getName(), message.getAuthor(),
-				message.getTime().replace(":", ""), SERVER_FILE_EXTENSION);
+				time.replace(":", ""), SERVER_FILE_EXTENSION);
 		return fileName;
 	}
 
 	private void fileInfoSendAction(Message message) {
 		try {
-			// String fileName = getServerFileName(message);
-			String fileName = message.getFile().getName();
+			String fileName = getServerFileName(message);
+			// String fileName = message.getFile().getName();
 			File file = new File(SERVER_DATA_PARENT_DIRECTORY, fileName);
 			fileOut = new DataOutputStream(new FileOutputStream(file));
 		} catch (Exception e) {
@@ -122,8 +125,8 @@ public class Server implements Runnable {
 
 	private void fileSendingAction(Message message) {
 		try {
-			System.out.println(message.getByteRead());
-			fileOut.write(message.getData(), 0, message.getByteRead());
+			fileOut.write(ArraysUtils.getPrimtiveArray(message.getData(), message.getByteRead()), 0,
+					message.getByteRead());
 			fileOut.flush();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -149,10 +152,8 @@ public class Server implements Runnable {
 	}
 
 	private void fileInfoReceiveAction(Message message) {
-		// System.out.println(getServerFileName(message));
-		// File file = new File(SERVER_DATA_PARENT_DIRECTORY, getServerFileName(message));
-		System.out.println(message.getFile().getName());
-		File file = new File(SERVER_DATA_PARENT_DIRECTORY, message.getFile().getName());
+		System.out.println(getServerFileName(message));
+		File file = new File(SERVER_DATA_PARENT_DIRECTORY, getServerFileName(message));
 		Message msgSend = new Message(message.getAuthor(), Message.FILE_INFO_RECEIVE, "");
 		msgSend.setFile(message.getFile());
 		executorService.execute(new FileSending(msgSend, file, writer));

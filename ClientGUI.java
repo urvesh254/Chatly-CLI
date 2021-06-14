@@ -19,8 +19,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
 import javax.swing.UIManager;
 
+import com.ukpatel.chatly.ArraysUtils;
 import com.ukpatel.chatly.Message;
 import com.ukpatel.layouts.ChatArea;
 import com.ukpatel.layouts.InfoPanel;
@@ -58,7 +60,7 @@ public class ClientGUI extends JFrame implements Runnable {
         setSize(500, 700);
         setIconImage(new ImageIcon("./assets/Chatly_logo.png").getImage());
         setLocationRelativeTo(null);
-        // setResizable(false);
+        setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("Chatly");
     }
@@ -133,6 +135,7 @@ public class ClientGUI extends JFrame implements Runnable {
     private void sendFile() {
         try {
             String path = "E:/Urvesh/Learning Tutorials/ICE GATE Lectures/DMGT/";
+            // String path = "C:/Users/urves/Desktop/";
             JFileChooser fileChooser = new JFileChooser(path);
             int returnVal = fileChooser.showOpenDialog(this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -264,13 +267,19 @@ public class ClientGUI extends JFrame implements Runnable {
     }
 
     private DataOutputStream fileOut = null;
+    private JProgressBar progressBar;
+    private long totalLen, receivedBytes;
 
     private void fileInfoReceiveAction(Message message) {
         try {
             String fileName = message.getFile().getName();
             System.out.println(fileName);
             File file = new File(CLIENT_DATA_PARENT_DIRECTORY, fileName);
+
             fileOut = new DataOutputStream(new FileOutputStream(file));
+            progressBar = chatArea.getFirstProgressBar();
+            totalLen = message.getFile().length();
+            receivedBytes = 0;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -278,8 +287,15 @@ public class ClientGUI extends JFrame implements Runnable {
 
     private void fileReceivingAction(Message message) {
         try {
-            fileOut.write(message.getData(), 0, message.getByteRead());
+            receivedBytes += message.getByteRead();
+            fileOut.write(ArraysUtils.getPrimtiveArray(message.getData(), message.getByteRead()), 0,
+                    message.getByteRead());
             fileOut.flush();
+
+            // Setting Progressbar value.
+            int sent = (int) ((receivedBytes * 100) / totalLen);
+            progressBar.setValue(sent);
+            progressBar.setString(sent + "%");
         } catch (Exception e) {
             e.printStackTrace();
         }

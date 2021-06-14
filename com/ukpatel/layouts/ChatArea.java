@@ -14,6 +14,7 @@ import java.awt.event.FocusListener;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -22,6 +23,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -31,7 +33,9 @@ import com.ukpatel.chatly.Message;
 
 public class ChatArea extends JPanel {
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private HashMap<JLabel, Message> fileMap = new HashMap<>();
+    private final HashMap<JLabel, Message> fileMap = new HashMap<>();
+    private final HashMap<Message, JProgressBar> progressMap = new HashMap<>();
+    private final LinkedList<JProgressBar> progressBars = new LinkedList<>();
 
     private JPanel messages;
     private JScrollPane scrollPane;
@@ -119,7 +123,6 @@ public class ChatArea extends JPanel {
         validate();
     }
 
-    // Only for sending the files.
     public synchronized void addMessage(Message message, ObjectOutputStream out, int messageType) {
         MessagePanel messagePanel = new MessagePanel(message, messageType);
         vertical.add(messagePanel);
@@ -129,12 +132,15 @@ public class ChatArea extends JPanel {
             JLabel downLabel = messagePanel.getFileDownloadLabel();
             if (downLabel != null) {
                 fileMap.put(downLabel, message);
+                progressMap.put(message, messagePanel.getProgressBar());
                 downLabel.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         JLabel downLabel = (JLabel) e.getSource();
                         Message msg = fileMap.get(downLabel);
-                        Message requestFile = new Message(msg.getAuthor(), Message.FILE_INFO_RECEIVE, "");
+                        progressBars.addLast(progressMap.get(msg));
+                        Message requestFile = new Message(msg.getAuthor(), Message.FILE_INFO_RECEIVE,
+                                message.getTime());
                         requestFile.setFile(msg.getFile());
                         System.out.println(msg.getFile() + ", " + msg.getAuthor() + ", " + msg.getTime());
                         try {
@@ -154,6 +160,10 @@ public class ChatArea extends JPanel {
         inputMessage.requestFocusInWindow();
         scrollToBottom(scrollPane);
         validate();
+    }
+
+    public JProgressBar getFirstProgressBar() {
+        return progressBars.removeFirst();
     }
 
     // Remove all message from panel.

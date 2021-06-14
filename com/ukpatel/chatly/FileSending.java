@@ -1,6 +1,6 @@
 package com.ukpatel.chatly;
 
-import java.io.DataInputStream;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectOutputStream;
@@ -43,7 +43,8 @@ public class FileSending implements Runnable {
         byte[] data = new byte[Message.BUFFER_SIZE];
         int infoType;
 
-        try (DataInputStream reader = new DataInputStream(new FileInputStream(file))) {
+        try (BufferedInputStream reader = new BufferedInputStream(new FileInputStream(file))) {
+
             // Sending File Info.
             infoType = isServerSending ? Message.FILE_INFO_RECEIVE : Message.FILE_INFO_SEND;
             rMessage = new Message(message.getAuthor(), infoType, "");
@@ -53,8 +54,9 @@ public class FileSending implements Runnable {
             // Sending file data to server.
             while ((byteRead = reader.read(data)) != -1) {
                 sentBytes += byteRead;
-                System.out.println(byteRead);
-                rMessage = new Message(message.getFile(), messageType, byteRead, data);
+                rMessage = new Message(message.getFile(), messageType, byteRead,
+                        ArraysUtils.getObjectArray(data, byteRead));
+
                 writer.writeObject(rMessage);
                 writer.flush();
 
