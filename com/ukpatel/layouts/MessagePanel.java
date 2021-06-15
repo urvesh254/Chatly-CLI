@@ -148,7 +148,7 @@ public class MessagePanel extends JPanel {
         fileSize.setFont(new Font("Time New Roman", Font.PLAIN, 11));
         bottomPanel.add(fileSize, BorderLayout.LINE_START);
 
-        JLabel timeLabel = new JLabel("12:05 PM", SwingConstants.RIGHT);
+        JLabel timeLabel = new JLabel(message.getTime(), SwingConstants.RIGHT);
         timeLabel.setBorder(new EmptyBorder(0, 0, 2, 2));
         timeLabel.setFont(new Font("Time New Roman", Font.PLAIN, 11));
         bottomPanel.add(timeLabel, BorderLayout.LINE_END);
@@ -194,7 +194,6 @@ public class MessagePanel extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 centerPanel.add(progressBar, BorderLayout.SOUTH);
                 centerPanel.validate();
-                System.out.println("inside messagePanel");
             }
         });
         centerPanel.add(fileDownloadLabel, BorderLayout.EAST);
@@ -210,7 +209,7 @@ public class MessagePanel extends JPanel {
         fileSize.setFont(new Font("Time New Roman", Font.PLAIN, 11));
         bottomPanel.add(fileSize, BorderLayout.LINE_START);
 
-        JLabel timeLabel = new JLabel("12:05 PM", SwingConstants.RIGHT);
+        JLabel timeLabel = new JLabel(message.getTime(), SwingConstants.RIGHT);
         timeLabel.setBorder(new EmptyBorder(0, 0, 2, 2));
         timeLabel.setFont(new Font("Time New Roman", Font.PLAIN, 11));
         bottomPanel.add(timeLabel, BorderLayout.LINE_END);
@@ -242,7 +241,9 @@ public class MessagePanel extends JPanel {
         } else if (len > 3) {
             ch = "K";
             size = (float) fileSize / 1000;
+        } else {
+            size = (float) fileSize;
         }
-        return String.format("%.2f %sB", size, ch);
+        return String.format("%.1f %sB", size, ch);
     }
 }

@@ -11,6 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
@@ -138,11 +139,15 @@ public class ChatArea extends JPanel {
                     public void mouseClicked(MouseEvent e) {
                         JLabel downLabel = (JLabel) e.getSource();
                         Message msg = fileMap.get(downLabel);
+                        JProgressBar progressBar = progressMap.get(msg);
+                        if (isDownloaded(message)) {
+                            return;
+                        }
+                        progressBar.setValue(0);
                         progressBars.addLast(progressMap.get(msg));
                         Message requestFile = new Message(msg.getAuthor(), Message.FILE_INFO_RECEIVE,
                                 message.getTime());
                         requestFile.setFile(msg.getFile());
-                        System.out.println(msg.getFile() + ", " + msg.getAuthor() + ", " + msg.getTime());
                         try {
                             out.writeObject(requestFile);
                         } catch (IOException e1) {
@@ -160,6 +165,10 @@ public class ChatArea extends JPanel {
         inputMessage.requestFocusInWindow();
         scrollToBottom(scrollPane);
         validate();
+    }
+
+    private boolean isDownloaded(Message msg) {
+        return new File("Chatly_Client_Data", msg.getFile().getName()).exists();
     }
 
     public JProgressBar getFirstProgressBar() {

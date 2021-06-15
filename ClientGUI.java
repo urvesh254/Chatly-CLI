@@ -29,7 +29,7 @@ import com.ukpatel.layouts.InfoPanel;
 import com.ukpatel.layouts.MessagePanel;
 
 public class ClientGUI extends JFrame implements Runnable {
-    private static final String CLIENT_DATA_PARENT_DIRECTORY = "Chatly_Client_Data";
+    public static final String CLIENT_DATA_PARENT_DIRECTORY = "Chatly_Client_Data";
 
     private ChatArea chatArea;
     private InfoPanel infoPanel;
@@ -134,13 +134,12 @@ public class ClientGUI extends JFrame implements Runnable {
 
     private void sendFile() {
         try {
-            String path = "E:/Urvesh/Learning Tutorials/ICE GATE Lectures/DMGT/";
-            // String path = "C:/Users/urves/Desktop/";
+            // String path = "E:/Urvesh/Learning Tutorials/ICE GATE Lectures/DMGT/";
+            String path = "C:/Users/urves/Desktop/";
             JFileChooser fileChooser = new JFileChooser(path);
             int returnVal = fileChooser.showOpenDialog(this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
-                System.out.println(file.getAbsolutePath());
                 Message message = new Message(clientName, Message.FILE_INFO_SEND, "File Sending...");
                 message.setFile(file);
                 chatArea.addMessage(message, sender, MessagePanel.USER_SEND);
@@ -241,6 +240,7 @@ public class ClientGUI extends JFrame implements Runnable {
                     chatArea.addMessage(message, MessagePanel.USER_RECEIVE);
                     break;
                 case Message.FILE_INFO:
+                    System.out.println(message.getFile() + " -> " + message.getMessage());
                     chatArea.addMessage(message, sender, MessagePanel.USER_RECEIVE);
                     break;
                 case Message.FILE_INFO_RECEIVE:
@@ -273,12 +273,12 @@ public class ClientGUI extends JFrame implements Runnable {
     private void fileInfoReceiveAction(Message message) {
         try {
             String fileName = message.getFile().getName();
-            System.out.println(fileName);
             File file = new File(CLIENT_DATA_PARENT_DIRECTORY, fileName);
 
             fileOut = new DataOutputStream(new FileOutputStream(file));
             progressBar = chatArea.getFirstProgressBar();
-            totalLen = message.getFile().length();
+
+            totalLen = Integer.parseInt(message.getMessage());
             receivedBytes = 0;
         } catch (Exception e) {
             e.printStackTrace();
