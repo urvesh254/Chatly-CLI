@@ -47,7 +47,7 @@ public class FileSending implements Runnable {
 
             // Sending File Info.
             infoType = isServerSending ? Message.FILE_INFO_RECEIVE : Message.FILE_INFO_SEND;
-            rMessage = new Message(message.getAuthor(), infoType, "");
+            rMessage = new Message(message.getAuthor(), infoType, "" + file.length());
             rMessage.setFile(message.getFile());
             writer.writeObject(rMessage);
 
@@ -71,7 +71,7 @@ public class FileSending implements Runnable {
 
             // Nofifing the file sending is done.
             infoType = isServerSending ? Message.FILE_RECEIVED : Message.FILE_SENT;
-            rMessage = new Message(this.message.getAuthor(), infoType, "");
+            rMessage = new Message(this.message.getAuthor(), infoType, "" + file.length());
             rMessage.setFile(message.getFile());
             writer.writeObject(rMessage);
         } catch (Exception e) {

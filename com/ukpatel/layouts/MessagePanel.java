@@ -204,7 +204,8 @@ public class MessagePanel extends JPanel {
         JPanel bottomPanel = new JPanel(new BorderLayout());
         bottomPanel.setBackground(new Color(37, 211, 102));
 
-        JLabel fileSize = new JLabel(getFileSize(message.getFile().length()), SwingConstants.RIGHT);
+        String size = getFileSize(Long.parseLong(message.getMessage()));
+        JLabel fileSize = new JLabel(size, SwingConstants.RIGHT);
         fileSize.setBorder(new EmptyBorder(2, 2, 2, 0));
         fileSize.setFont(new Font("Time New Roman", Font.PLAIN, 11));
         bottomPanel.add(fileSize, BorderLayout.LINE_START);

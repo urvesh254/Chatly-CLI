@@ -240,7 +240,6 @@ public class ClientGUI extends JFrame implements Runnable {
                     chatArea.addMessage(message, MessagePanel.USER_RECEIVE);
                     break;
                 case Message.FILE_INFO:
-                    System.out.println(message.getFile() + " -> " + message.getMessage());
                     chatArea.addMessage(message, sender, MessagePanel.USER_RECEIVE);
                     break;
                 case Message.FILE_INFO_RECEIVE:
@@ -278,7 +277,7 @@ public class ClientGUI extends JFrame implements Runnable {
             fileOut = new DataOutputStream(new FileOutputStream(file));
             progressBar = chatArea.getFirstProgressBar();
 
-            totalLen = Integer.parseInt(message.getMessage());
+            totalLen = Long.parseLong(message.getMessage());
             receivedBytes = 0;
         } catch (Exception e) {
             e.printStackTrace();
@@ -294,6 +293,7 @@ public class ClientGUI extends JFrame implements Runnable {
 
             // Setting Progressbar value.
             int sent = (int) ((receivedBytes * 100) / totalLen);
+
             progressBar.setValue(sent);
             progressBar.setString(sent + "%");
         } catch (Exception e) {

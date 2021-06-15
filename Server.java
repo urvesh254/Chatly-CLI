@@ -89,7 +89,6 @@ public class Server implements Runnable {
 			}
 
 		} catch (Exception e) {
-			System.out.println(e);
 			System.out.println(clientName + " left the chat.");
 			sendOtherClients(new Message("Server", Message.USER_EXIT, clientName + " left the chat."));
 		} finally {
@@ -146,8 +145,7 @@ public class Server implements Runnable {
 		System.out.println(String.format("%s sent the %s file.", message.getAuthor(), message.getFile().getName()));
 
 		// Sending other client to file info.
-		System.out.println(message.getFile() + "-> " + message.getFile().length());
-		Message msg = new Message(message.getAuthor(), Message.FILE_INFO, "" + message.getFile().length());
+		Message msg = new Message(message.getAuthor(), Message.FILE_INFO, message.getMessage());
 		msg.setFile(message.getFile());
 		msg.setTime(message.getTime());
 		sendOtherClients(msg);
@@ -156,7 +154,6 @@ public class Server implements Runnable {
 	private void fileInfoReceiveAction(Message message) {
 		File file = new File(SERVER_DATA_PARENT_DIRECTORY, getServerFileName(message));
 		Message msgSend = new Message(message.getAuthor(), Message.FILE_INFO_RECEIVE, "" + message.getFile().length());
-		System.out.println(message.getFile() + " " + message.getFile().length());
 		msgSend.setFile(message.getFile());
 		executorService.execute(new FileSending(msgSend, file, writer));
 	}
