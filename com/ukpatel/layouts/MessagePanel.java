@@ -66,12 +66,14 @@ public class MessagePanel extends JPanel {
         JLabel authorLabel = new JLabel(message.getAuthor());
         authorLabel.setOpaque(true);
         authorLabel.setBorder(new EmptyBorder(2, 2, 0, 0));
-        authorLabel.setForeground(Color.RED);
+        authorLabel.setForeground(Color.decode("#ffffff"));
+        // authorLabel.setForeground(Color.decode("#073B4C"));
         authorLabel.setBackground(new Color(37, 211, 102));
-        authorLabel.setFont(new Font("Time New Roman", Font.PLAIN, 11));
+        authorLabel.setFont(new Font("Time New Roman", Font.BOLD, 12));
         receivePanel.add(authorLabel, BorderLayout.PAGE_START);
 
-        JLabel msgLabel = new JLabel(getFormattedMessage(message.getMessage()));
+        JLabel msgLabel = new JLabel();
+        msgLabel.setText(getFormattedMessage(message.getMessage()));
         msgLabel.setOpaque(true);
         msgLabel.setBackground(new Color(37, 211, 102));
         msgLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
@@ -91,7 +93,7 @@ public class MessagePanel extends JPanel {
     private static String getFormattedMessage(String message) {
         StringBuilder formattedMessage = new StringBuilder();
         formattedMessage.append("<html>").append("<body>");
-        formattedMessage.append("<p style=\"width: 280px\">");
+        formattedMessage.append("<p style=\"width:280px\">");
         formattedMessage.append(message.replaceAll("\n", "<br>"));
         formattedMessage.append("</p>").append("</body>").append("</html>");
         return formattedMessage.toString();
