@@ -7,37 +7,38 @@
     android:layout_marginStart="3dp"
     android:paddingTop="10dp">
 
-    <TextView
-        android:id="@+id/message"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/receive_green_bg"
-        android:maxWidth="320dp"
-        android:paddingTop="13dp"
-        android:text="Hello World!!"
-        android:textSize="15sp"
+        android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="3dp"
-        android:text="12:00 PM"
-        android:textSize="10sp"
-        app:layout_constraintBottom_toBottomOf="@+id/message"
-        app:layout_constraintEnd_toEndOf="@id/message" />
+        <TextView
+            android:id="@+id/author"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Urvesh Patel"
+            android:textColor="#FF5722"
+            android:textSize="10sp" />
 
-    <TextView
-        android:id="@+id/author"
-        android:layout_width="@+id/message"
-        android:layout_height="wrap_content"
-        android:minWidth="50dp"
-        android:paddingLeft="5dp"
-        android:text="Urvesh Patel"
-        android:textColor="#FF5722"
-        android:textSize="10sp"
-        app:layout_constraintStart_toStartOf="@id/message"
-        app:layout_constraintTop_toTopOf="@+id/message" />
+        <TextView
+            android:id="@+id/message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="320dp"
+            android:text="Hello World!!"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="12:00 PM"
+            android:textSize="10sp" />
+
+
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

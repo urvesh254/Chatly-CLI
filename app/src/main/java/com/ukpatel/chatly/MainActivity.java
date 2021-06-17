@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (PORT != 0)
             port.setText(String.valueOf(PORT));
 
-        hostName.setText("192.168.0.125");
+//        hostName.setText("192.168.0.125");
         btnConnect.setOnClickListener(this);
     }
 
