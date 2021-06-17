@@ -121,8 +121,10 @@ public class ClientGUI extends JFrame implements Runnable {
     private void sendMessage(String messageText) {
         Message message = new Message(clientName, Message.MESSAGE_SEND, messageText);
         try {
-            sender.writeObject(message);
-            sender.flush();
+            synchronized (sender) {
+                sender.writeObject(message);
+                sender.flush();
+            }
             chatArea.addMessage(message, MessagePanel.USER_SEND);
             chatArea.clearInputMessageField();
         } catch (SocketException e) {

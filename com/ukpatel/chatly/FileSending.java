@@ -49,7 +49,7 @@ public class FileSending implements Runnable {
             infoType = isServerSending ? Message.FILE_INFO_RECEIVE : Message.FILE_INFO_SEND;
             rMessage = new Message(message.getAuthor(), infoType, "" + file.length());
             rMessage.setFile(message.getFile());
-            writer.writeObject(rMessage);
+            sendMsg(rMessage);
 
             // Sending file data to server.
             while ((byteRead = reader.read(data)) != -1) {
@@ -57,8 +57,7 @@ public class FileSending implements Runnable {
                 rMessage = new Message(message.getFile(), messageType, byteRead,
                         ArraysUtils.getObjectArray(data, byteRead));
 
-                writer.writeObject(rMessage);
-                writer.flush();
+                sendMsg(rMessage);
 
                 if (!isServerSending) {
                     int sent = (int) ((sentBytes * 100) / totalLen);
@@ -73,9 +72,16 @@ public class FileSending implements Runnable {
             infoType = isServerSending ? Message.FILE_RECEIVED : Message.FILE_SENT;
             rMessage = new Message(this.message.getAuthor(), infoType, "" + file.length());
             rMessage.setFile(message.getFile());
-            writer.writeObject(rMessage);
+            sendMsg(rMessage);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void sendMsg(Message msg) throws Exception {
+        synchronized (writer) {
+            writer.writeObject(msg);
+            writer.flush();
         }
     }
 }
