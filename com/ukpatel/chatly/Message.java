@@ -7,7 +7,7 @@ import java.util.Date;
 
 public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
-    // Sending or Receving Buffere Size.
+    // Buffere Size for transfering the data.
     // 8192, 16384, 65536
     public static final int BUFFER_SIZE = 16384;
 
