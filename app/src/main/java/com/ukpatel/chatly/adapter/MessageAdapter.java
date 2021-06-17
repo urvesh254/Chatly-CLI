@@ -18,15 +18,13 @@ import java.util.ArrayList;
 
 public class MessageAdapter extends RecyclerView.Adapter {
     private final ArrayList<Message> messages;
-    private final String userName;
 
     private static final int MESSAGE_INFO = 0;
     private static final int MESSAGE_SENT = 1;
     private static final int MESSAGE_RECEIVE = 2;
 
-    public MessageAdapter(ArrayList<Message> messages, String userName) {
+    public MessageAdapter(ArrayList<Message> messages) {
         this.messages = messages;
-        this.userName = userName;
     }
 
     @NonNull

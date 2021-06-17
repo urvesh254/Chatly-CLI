@@ -36,7 +36,7 @@ public class ChatArea extends AppCompatActivity {
         msg = findViewById(R.id.msgSend);
         btnSend = findViewById(R.id.btnSend);
         RecyclerView recyclerView = findViewById(R.id.history);
-        MessageAdapter messageAdapter = new MessageAdapter(new ArrayList<Message>(), Client.clientName);
+        MessageAdapter messageAdapter = new MessageAdapter(new ArrayList<Message>());
 //        history.setMovementMethod(new ScrollingMovementMethod());
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
