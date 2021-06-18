@@ -5,10 +5,19 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * @author Urveshkumar Patel
+ */
 public class Message implements Serializable {
+    /**
+     * The purpose of this variable to identify while serialize or deserialize.
+     */
     private static final long serialVersionUID = 1L;
-    // Buffere Size for transfering the data.
-    // 8192, 16384, 65536
+
+    /**
+     * This variable show the size of the transferring the file data in one cycle.
+     * It can be anything like 8192, 16384, 65536.
+     */
     public static final int BUFFER_SIZE = 16384;
 
     // Types of the messages.
@@ -29,7 +38,7 @@ public class Message implements Serializable {
     private String author;
     private String time;
 
-    protected File file;
+    private File file;
     private Byte[] data;
     private int byteRead;
 
@@ -93,6 +102,7 @@ public class Message implements Serializable {
 
     @Override
     public String toString() {
-        return this.author + " : " + this.message;
+        return "Message [author=" + author + ", message=" + message + ", messageType=" + messageType + ", time=" + time
+                + "]";
     }
 }

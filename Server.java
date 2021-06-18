@@ -19,6 +19,9 @@ import com.ukpatel.chatly.ArraysUtils;
 import com.ukpatel.chatly.FileSending;
 import com.ukpatel.chatly.Message;
 
+/**
+ * @author Urveshkumar Patel
+ */
 public class Server implements Runnable {
 	private static final ArrayList<ObjectOutputStream> clientsOutputStreams = new ArrayList<>();
 	private static final ArrayList<ObjectInputStream> clientsInputStreams = new ArrayList<>();

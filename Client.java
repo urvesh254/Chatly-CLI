@@ -11,6 +11,9 @@ import java.net.UnknownHostException;
 
 import com.ukpatel.chatly.Message;
 
+/**
+ * @author Urveshkumar Patel
+ */
 public class Client implements Runnable {
 
 	private int PORT;

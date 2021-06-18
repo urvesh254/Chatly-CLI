@@ -28,6 +28,9 @@ import com.ukpatel.layouts.ChatArea;
 import com.ukpatel.layouts.InfoPanel;
 import com.ukpatel.layouts.MessagePanel;
 
+/**
+ * @author Urveshkumar Patel
+ */
 public class ClientGUI extends JFrame implements Runnable {
     public static final String CLIENT_DATA_PARENT_DIRECTORY = "Chatly_Client_Data";
 

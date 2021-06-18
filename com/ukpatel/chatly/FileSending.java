@@ -7,6 +7,10 @@ import java.io.ObjectOutputStream;
 
 import javax.swing.JProgressBar;
 
+/**
+ * FileSending is class for sending the file data across two device.
+ * @author Urveshkumar Patel
+ */
 public class FileSending implements Runnable {
 
     private ObjectOutputStream writer;
@@ -25,7 +29,7 @@ public class FileSending implements Runnable {
         this.messageType = Message.FILE_SENDING;
     }
 
-    // For Server.
+    // For Server
     public FileSending(Message message, File file, ObjectOutputStream writer) {
         this.message = message;
         this.file = file;

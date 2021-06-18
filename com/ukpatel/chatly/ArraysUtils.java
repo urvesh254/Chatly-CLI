@@ -1,5 +1,8 @@
 package com.ukpatel.chatly;
 
+/**
+ * @author Urveshkumar Patel
+ */
 public class ArraysUtils {
     public static byte[] getPrimtiveArray(Byte[] arr, int offset) {
         byte[] newArr = new byte[arr.length];

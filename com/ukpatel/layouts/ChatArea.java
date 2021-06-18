@@ -48,7 +48,7 @@ public class ChatArea extends JPanel {
 
     private Font gainFont = new Font("Tahoma", Font.PLAIN, 20);
     private Font lostFont = new Font("Tahoma", Font.ITALIC, 20);
-    public static final String HINT = "Type a mesage";
+    public static final String HINT = "Type a message";
 
     public ChatArea() {
         this.setLayout(new BorderLayout());
@@ -117,7 +117,6 @@ public class ChatArea extends JPanel {
     public synchronized void addMessage(Message message, int messageType) {
         vertical.add(new MessagePanel(message, messageType));
         vertical.add(Box.createVerticalStrut(10));
-
         messages.add(vertical, BorderLayout.PAGE_START);
         inputMessage.requestFocusInWindow();
         scrollToBottom(scrollPane);
