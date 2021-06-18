@@ -29,7 +29,7 @@ public class ChatArea extends JPanel {
 
     private Font gainFont = new Font("Tahoma", Font.PLAIN, 20);
     private Font lostFont = new Font("Tahoma", Font.ITALIC, 20);
-    public static final String HINT = "Type a mesage";
+    public static final String HINT = "Type a message";
 
     public ChatArea() {
         this.setLayout(new BorderLayout());

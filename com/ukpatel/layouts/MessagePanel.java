@@ -3,6 +3,7 @@ package com.ukpatel.layouts;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -16,8 +17,12 @@ public class MessagePanel extends JPanel {
     public static final int USER_SEND = 1;
     public static final int USER_RECEIVE = 2;
 
+    private static final Font MESSAGE_FONT = new Font("Tahoma", Font.PLAIN, 18);
+    private FontMetrics metrics;
+
     public MessagePanel(Message message, int messageType) {
         this.setLayout(new BorderLayout());
+        this.metrics = this.getFontMetrics(MESSAGE_FONT);
 
         if (messageType == MessagePanel.USER_SEND) {
             this.add(getSendPanel(message), BorderLayout.LINE_END);
@@ -42,7 +47,8 @@ public class MessagePanel extends JPanel {
         JPanel sendPanel = new JPanel();
         sendPanel.setLayout(new BorderLayout());
 
-        JLabel msgLabel = new JLabel(getFormattedMessage(message.getMessage()));
+        int msgWidth = getMessageWidth(message.getMessage(), 280);
+        JLabel msgLabel = new JLabel(getFormattedMessage(message.getMessage(), msgWidth));
         msgLabel.setOpaque(true);
         msgLabel.setBackground(new Color(37, 211, 102));
         msgLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
@@ -72,8 +78,8 @@ public class MessagePanel extends JPanel {
         authorLabel.setFont(new Font("Time New Roman", Font.BOLD, 12));
         receivePanel.add(authorLabel, BorderLayout.PAGE_START);
 
-        JLabel msgLabel = new JLabel();
-        msgLabel.setText(getFormattedMessage(message.getMessage()));
+        int msgWidth = getMessageWidth(message.getMessage(), 280);
+        JLabel msgLabel = new JLabel(getFormattedMessage(message.getMessage(), msgWidth));
         msgLabel.setOpaque(true);
         msgLabel.setBackground(new Color(37, 211, 102));
         msgLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
@@ -90,13 +96,18 @@ public class MessagePanel extends JPanel {
         return receivePanel;
     }
 
-    private static String getFormattedMessage(String message) {
+    private static String getFormattedMessage(String message, int width) {
         StringBuilder formattedMessage = new StringBuilder();
         formattedMessage.append("<html>").append("<body>");
-        formattedMessage.append("<p style=\"width:280px\">");
+        formattedMessage.append("<p style=\"width:" + width + "px\">");
         formattedMessage.append(message.replaceAll("\n", "<br>"));
         formattedMessage.append("</p>").append("</body>").append("</html>");
         return formattedMessage.toString();
+    }
+
+    private int getMessageWidth(String msg, final int limit) {
+        int width = metrics.stringWidth(msg);
+        return width > limit ? limit : width;
     }
 
 }
