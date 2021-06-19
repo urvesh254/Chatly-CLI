@@ -169,7 +169,7 @@ public class MessagePanel extends JPanel {
         JPanel receivePanel = new JPanel();
         receivePanel.setLayout(new BorderLayout());
 
-        JLabel authorLabel = new JLabel("Urvesh Patel");
+        JLabel authorLabel = new JLabel(message.getAuthor());
         authorLabel.setOpaque(true);
         authorLabel.setBorder(new EmptyBorder(2, 2, 0, 0));
         authorLabel.setForeground(Color.WHITE);

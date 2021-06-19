@@ -104,7 +104,6 @@ public class Server implements Runnable {
 		}
 	}
 
-	// private BufferedOutputStream fileOut = null;
 	private BufferedOutputStream fileOut = null;
 	private Message fileSendMsg = null;
 
