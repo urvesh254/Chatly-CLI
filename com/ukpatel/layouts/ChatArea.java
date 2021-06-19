@@ -174,6 +174,10 @@ public class ChatArea extends JPanel {
         return progressBars.removeFirst();
     }
 
+    public JPanel getMessagesPanel() {
+        return this.messages;
+    }
+
     // Remove all message from panel.
     public void removeAllMessages() {
         vertical.removeAll();

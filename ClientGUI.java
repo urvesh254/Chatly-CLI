@@ -3,6 +3,10 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.dnd.DropTarget;
+import java.awt.datatransfer.*;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTargetDropEvent;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,6 +18,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -44,6 +49,35 @@ public class ClientGUI extends JFrame implements Runnable {
 
     private Socket socket;
     private ObjectOutputStream sender;
+
+    private class DropFileListener extends DropTarget {
+        @Override
+        public void drop(DropTargetDropEvent dtde) {
+            dtde.acceptDrop(DnDConstants.ACTION_COPY);
+
+            Transferable tf = dtde.getTransferable();
+            DataFlavor[] dataFlavors = tf.getTransferDataFlavors();
+
+            for (DataFlavor dataFlavor : dataFlavors) {
+                try {
+                    if (dataFlavor.isFlavorJavaFileListType()) {
+                        List<?> files = (List<?>) tf.getTransferData(dataFlavor);
+                        boolean showWarning = true;
+                        for (Object f : files) {
+                            File file = (File) f;
+                            if (file.isFile())
+                                sendFileHelper((File) file);
+                            else if (file.isDirectory() && showWarning) {
+                                showToast("Can't send directory direct.");
+                                showWarning = false;
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                }
+            }
+        }
+    }
 
     public ClientGUI() {
         card = new CardLayout();
@@ -108,6 +142,9 @@ public class ClientGUI extends JFrame implements Runnable {
                 sendFile();
             }
         });
+
+        // File Drop Listener.
+        new DropTarget(chatArea.getMessagesPanel(), new DropFileListener());
     }
 
     private void connectToServer() {
@@ -145,12 +182,16 @@ public class ClientGUI extends JFrame implements Runnable {
             int returnVal = fileChooser.showOpenDialog(this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
-                Message message = new Message(clientName, Message.FILE_INFO_SEND, "File Sending...");
-                message.setFile(file);
-                chatArea.addMessage(message, sender, MessagePanel.USER_SEND);
+                sendFileHelper(file);
             }
         } catch (Exception e) {
         }
+    }
+
+    private void sendFileHelper(File file) {
+        Message message = new Message(clientName, Message.FILE_INFO_SEND, "File Sending...");
+        message.setFile(file);
+        chatArea.addMessage(message, sender, MessagePanel.USER_SEND);
     }
 
     private boolean isConnected() {
