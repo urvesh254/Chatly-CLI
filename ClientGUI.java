@@ -1,12 +1,13 @@
 import java.awt.CardLayout;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.dnd.DropTarget;
-import java.awt.datatransfer.*;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTargetDropEvent;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,8 +28,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.UIManager;
 
-import com.ukpatel.chatly.ArraysUtils;
 import com.ukpatel.chatly.Message;
+import com.ukpatel.chatly.Utils;
 import com.ukpatel.layouts.ChatArea;
 import com.ukpatel.layouts.InfoPanel;
 import com.ukpatel.layouts.MessagePanel;
@@ -333,8 +334,7 @@ public class ClientGUI extends JFrame implements Runnable {
     private void fileReceivingAction(Message message) {
         try {
             receivedBytes += message.getByteRead();
-            fileOut.write(ArraysUtils.getPrimtiveArray(message.getData(), message.getByteRead()), 0,
-                    message.getByteRead());
+            fileOut.write(Utils.getPrimitiveArray(message.getData(), message.getByteRead()), 0, message.getByteRead());
             fileOut.flush();
 
             // Setting Progressbar value.

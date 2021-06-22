@@ -14,6 +14,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import com.ukpatel.chatly.Message;
+import com.ukpatel.chatly.Utils;
 
 public class MessagePanel extends JPanel {
 
@@ -151,7 +152,7 @@ public class MessagePanel extends JPanel {
         JPanel bottomPanel = new JPanel(new BorderLayout());
         bottomPanel.setBackground(new Color(37, 211, 102));
 
-        JLabel fileSize = new JLabel(getFileSize(message.getFile().length()), SwingConstants.RIGHT);
+        JLabel fileSize = new JLabel(Utils.getFileSize(message.getFile().length()), SwingConstants.RIGHT);
         fileSize.setBorder(new EmptyBorder(2, 2, 2, 0));
         fileSize.setFont(new Font("Time New Roman", Font.PLAIN, 11));
         bottomPanel.add(fileSize, BorderLayout.LINE_START);
@@ -212,7 +213,7 @@ public class MessagePanel extends JPanel {
         JPanel bottomPanel = new JPanel(new BorderLayout());
         bottomPanel.setBackground(new Color(37, 211, 102));
 
-        String size = getFileSize(Long.parseLong(message.getMessage()));
+        String size = Utils.getFileSize(Long.parseLong(message.getMessage()));
         JLabel fileSize = new JLabel(size, SwingConstants.RIGHT);
         fileSize.setBorder(new EmptyBorder(2, 2, 2, 0));
         fileSize.setFont(new Font("Time New Roman", Font.PLAIN, 11));
@@ -239,25 +240,5 @@ public class MessagePanel extends JPanel {
     private int getMessageWidth(String msg, final int limit) {
         int width = metrics.stringWidth(msg);
         return width > limit ? limit : width;
-    }
-
-    private String getFileSize(long fileSize) {
-        String s = String.valueOf(fileSize);
-        int len = s.length();
-        String ch = "";
-        float size = 0;
-        if (len > 9) {
-            ch = "G";
-            size = (float) fileSize / 1000000000;
-        } else if (len > 6) {
-            ch = "M";
-            size = (float) fileSize / 1000000;
-        } else if (len > 3) {
-            ch = "K";
-            size = (float) fileSize / 1000;
-        } else {
-            size = (float) fileSize;
-        }
-        return String.format("%.1f %sB", size, ch);
     }
 }

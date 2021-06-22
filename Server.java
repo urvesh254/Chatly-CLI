@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.ukpatel.chatly.ArraysUtils;
+import com.ukpatel.chatly.Utils;
 import com.ukpatel.chatly.FileSending;
 import com.ukpatel.chatly.Message;
 
@@ -126,8 +126,7 @@ public class Server implements Runnable {
 
 	private void fileSendingAction(Message message) {
 		try {
-			fileOut.write(ArraysUtils.getPrimtiveArray(message.getData(), message.getByteRead()), 0,
-					message.getByteRead());
+			fileOut.write(Utils.getPrimitiveArray(message.getData(), message.getByteRead()), 0, message.getByteRead());
 			fileOut.flush();
 		} catch (Exception e) {
 			e.printStackTrace();

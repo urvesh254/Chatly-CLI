@@ -58,8 +58,7 @@ public class FileSending implements Runnable {
             // Sending file data to server.
             while ((byteRead = reader.read(data)) != -1) {
                 sentBytes += byteRead;
-                rMessage = new Message(message.getFile(), messageType, byteRead,
-                        ArraysUtils.getObjectArray(data, byteRead));
+                rMessage = new Message(message.getFile(), messageType, byteRead, Utils.getObjectArray(data, byteRead));
 
                 sendMsg(rMessage);
 
