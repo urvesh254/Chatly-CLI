@@ -1,6 +1,15 @@
 import java.awt.CardLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.dnd.DropTarget;
+import java.awt.datatransfer.*;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTargetDropEvent;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -9,17 +18,26 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.List;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
+import javax.swing.UIManager;
 
+import com.ukpatel.chatly.ArraysUtils;
 import com.ukpatel.chatly.Message;
 import com.ukpatel.layouts.ChatArea;
 import com.ukpatel.layouts.InfoPanel;
 import com.ukpatel.layouts.MessagePanel;
 
+/**
+ * @author Urveshkumar Patel
+ */
 public class ClientGUI extends JFrame implements Runnable {
+    public static final String CLIENT_DATA_PARENT_DIRECTORY = "Chatly_Client_Data";
 
     private ChatArea chatArea;
     private InfoPanel infoPanel;
@@ -32,9 +50,41 @@ public class ClientGUI extends JFrame implements Runnable {
     private Socket socket;
     private ObjectOutputStream sender;
 
+    private class DropFileListener extends DropTarget {
+        @Override
+        public void drop(DropTargetDropEvent dtde) {
+            dtde.acceptDrop(DnDConstants.ACTION_COPY);
+
+            Transferable tf = dtde.getTransferable();
+            DataFlavor[] dataFlavors = tf.getTransferDataFlavors();
+
+            for (DataFlavor dataFlavor : dataFlavors) {
+                try {
+                    if (dataFlavor.isFlavorJavaFileListType()) {
+                        List<?> files = (List<?>) tf.getTransferData(dataFlavor);
+                        boolean showWarning = true;
+                        for (Object f : files) {
+                            File file = (File) f;
+                            if (file.isFile())
+                                sendFileHelper((File) file);
+                            else if (file.isDirectory() && showWarning) {
+                                showToast("Can't send directory direct.");
+                                showWarning = false;
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                }
+            }
+        }
+    }
+
     public ClientGUI() {
         card = new CardLayout();
         this.setLayout(card);
+
+        // Setting Look and Feel of the frame.
+        setLookAndFeel();
 
         infoPanel = new InfoPanel();
         add(infoPanel, "infoPanel");
@@ -86,6 +136,15 @@ public class ClientGUI extends JFrame implements Runnable {
 
         });
 
+        chatArea.getAttachmentLabel().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                sendFile();
+            }
+        });
+
+        // File Drop Listener.
+        new DropTarget(chatArea.getMessagesPanel(), new DropFileListener());
     }
 
     private void connectToServer() {
@@ -102,7 +161,10 @@ public class ClientGUI extends JFrame implements Runnable {
     private void sendMessage(String messageText) {
         Message message = new Message(clientName, Message.MESSAGE_SEND, messageText);
         try {
-            sender.writeObject(message);
+            synchronized (sender) {
+                sender.writeObject(message);
+                sender.flush();
+            }
             chatArea.addMessage(message, MessagePanel.USER_SEND);
             chatArea.clearInputMessageField();
         } catch (SocketException e) {
@@ -110,6 +172,26 @@ public class ClientGUI extends JFrame implements Runnable {
         } catch (Exception e) {
             showToast("Some problem in connection. \nRestart the application and reconnect to ther server.");
         }
+    }
+
+    private void sendFile() {
+        try {
+            // String path = "E:/Urvesh/Learning Tutorials/ICE GATE Lectures/DMGT/";
+            String path = "C:/Users/urves/Desktop/";
+            JFileChooser fileChooser = new JFileChooser(path);
+            int returnVal = fileChooser.showOpenDialog(this);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                sendFileHelper(file);
+            }
+        } catch (Exception e) {
+        }
+    }
+
+    private void sendFileHelper(File file) {
+        Message message = new Message(clientName, Message.FILE_INFO_SEND, "File Sending...");
+        message.setFile(file);
+        chatArea.addMessage(message, sender, MessagePanel.USER_SEND);
     }
 
     private boolean isConnected() {
@@ -175,6 +257,13 @@ public class ClientGUI extends JFrame implements Runnable {
 
     public static void main(String[] args) {
         try {
+            // Initializing Client Data Directory.
+            File directory = new File(CLIENT_DATA_PARENT_DIRECTORY);
+            if (!directory.exists()) {
+                directory.mkdir();
+            }
+
+            // Showing GUI
             new ClientGUI().setVisible(true);
         } catch (Exception e) {
             e.printStackTrace();
@@ -192,17 +281,90 @@ public class ClientGUI extends JFrame implements Runnable {
             Message message;
             while (true) {
                 message = (Message) reader.readObject();
-                if (message.getMessageType() == Message.MESSAGE_RECEIVE)
+                switch (message.getMessageType()) {
+                case Message.MESSAGE_RECEIVE:
                     chatArea.addMessage(message, MessagePanel.USER_RECEIVE);
-                else
+                    break;
+                case Message.FILE_INFO:
+                    chatArea.addMessage(message, sender, MessagePanel.USER_RECEIVE);
+                    break;
+                case Message.FILE_INFO_RECEIVE:
+                    fileInfoReceiveAction(message);
+                    break;
+                case Message.FILE_RECEIVING:
+                    fileReceivingAction(message);
+                    break;
+                case Message.FILE_RECEIVED:
+                    fileReceivedAction(message);
+                    break;
+                default:
                     chatArea.addMessage(message, MessagePanel.USER_INFO);
+                }
             }
         } catch (SocketException e) {
             showToast("Server is closed.");
+            chatArea.removeAllMessages();
             card.show(getContentPane(), "infoPanel");
         } catch (Exception e) {
             e.printStackTrace();
             showToast("Some problem in connection. \nRestart the application and reconnect to ther server.");
+        }
+    }
+
+    private DataOutputStream fileOut = null;
+    private JProgressBar progressBar;
+    private long totalLen, receivedBytes;
+
+    private void fileInfoReceiveAction(Message message) {
+        try {
+            String fileName = message.getFile().getName();
+            File file = new File(CLIENT_DATA_PARENT_DIRECTORY, fileName);
+
+            fileOut = new DataOutputStream(new FileOutputStream(file));
+            progressBar = chatArea.getFirstProgressBar();
+
+            totalLen = Long.parseLong(message.getMessage());
+            receivedBytes = 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void fileReceivingAction(Message message) {
+        try {
+            receivedBytes += message.getByteRead();
+            fileOut.write(ArraysUtils.getPrimtiveArray(message.getData(), message.getByteRead()), 0,
+                    message.getByteRead());
+            fileOut.flush();
+
+            // Setting Progressbar value.
+            int sent = (int) ((receivedBytes * 100) / totalLen);
+
+            progressBar.setValue(sent);
+            progressBar.setString(sent + "%");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void fileReceivedAction(Message message) {
+        // Closing the fileOut
+        if (fileOut != null) {
+            try {
+                fileOut.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void setLookAndFeel() {
+        try {
+            String lookAndFeel = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+            UIManager.setLookAndFeel(lookAndFeel);
+        } catch (Exception e) {
+            e.printStackTrace();
+
         }
     }
 }

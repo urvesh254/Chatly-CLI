@@ -7,25 +7,44 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.io.File;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.swing.Box;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import com.ukpatel.chatly.FileSending;
 import com.ukpatel.chatly.Message;
 
 public class ChatArea extends JPanel {
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private final HashMap<JLabel, Message> fileMap = new HashMap<>();
+    private final HashMap<Message, JProgressBar> progressMap = new HashMap<>();
+    private final LinkedList<JProgressBar> progressBars = new LinkedList<>();
+
     private JPanel messages;
     private JScrollPane scrollPane;
     private Box vertical = Box.createVerticalBox();
 
     private JTextField inputMessage;
     private JButton btnSend;
+    private JLabel attachmentLabel;
 
     private Font gainFont = new Font("Tahoma", Font.PLAIN, 20);
     private Font lostFont = new Font("Tahoma", Font.ITALIC, 20);
@@ -78,10 +97,19 @@ public class ChatArea extends JPanel {
         });
         inputPanel.add(inputMessage, BorderLayout.CENTER);
 
-        btnSend = new JButton("Send");
+        // Side Button Panel.
+        JPanel btnPanel = new JPanel();
+
+        // Attachment label
+        attachmentLabel = new JLabel(new ImageIcon("assets/attachment-35.png"));
+        btnPanel.add(attachmentLabel);
+
+        // Send Button
+        btnSend = new JButton(new ImageIcon("assets/send-35.png"));
         btnSend.setFont(new Font("Tahoma", Font.BOLD, 25));
-        btnSend.setBackground(new Color(37, 211, 102));
-        inputPanel.add(btnSend, BorderLayout.LINE_END);
+        btnPanel.add(btnSend);
+
+        inputPanel.add(btnPanel, BorderLayout.LINE_END);
 
         add(inputPanel, BorderLayout.SOUTH);
     }
@@ -89,11 +117,70 @@ public class ChatArea extends JPanel {
     public synchronized void addMessage(Message message, int messageType) {
         vertical.add(new MessagePanel(message, messageType));
         vertical.add(Box.createVerticalStrut(10));
+        messages.add(vertical, BorderLayout.PAGE_START);
+        inputMessage.requestFocusInWindow();
+        scrollToBottom(scrollPane);
+        validate();
+    }
+
+    public synchronized void addMessage(Message message, ObjectOutputStream out, int messageType) {
+        MessagePanel messagePanel = new MessagePanel(message, messageType);
+        vertical.add(messagePanel);
+        vertical.add(Box.createVerticalStrut(10));
+
+        if (message.getMessageType() == Message.FILE_INFO) {
+            JLabel downLabel = messagePanel.getFileDownloadLabel();
+            if (downLabel != null) {
+                fileMap.put(downLabel, message);
+                progressMap.put(message, messagePanel.getProgressBar());
+                downLabel.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        JLabel downLabel = (JLabel) e.getSource();
+                        Message msg = fileMap.get(downLabel);
+                        JProgressBar progressBar = progressMap.get(msg);
+                        if (isDownloaded(message)) {
+                            return;
+                        }
+                        progressBar.setValue(0);
+                        progressBars.addLast(progressMap.get(msg));
+                        Message requestFile = new Message(msg.getAuthor(), Message.FILE_INFO_RECEIVE,
+                                message.getTime());
+                        requestFile.setFile(msg.getFile());
+                        try {
+                            out.writeObject(requestFile);
+                        } catch (IOException e1) {
+                        }
+                    }
+                });
+            }
+        } else {
+            // Sending file to server.
+            // Sending file one at a time.
+            executorService.execute(new FileSending(message, out, messagePanel.getProgressBar()));
+        }
 
         messages.add(vertical, BorderLayout.PAGE_START);
         inputMessage.requestFocusInWindow();
         scrollToBottom(scrollPane);
         validate();
+    }
+
+    private boolean isDownloaded(Message msg) {
+        return new File("Chatly_Client_Data", msg.getFile().getName()).exists();
+    }
+
+    public JProgressBar getFirstProgressBar() {
+        return progressBars.removeFirst();
+    }
+
+    public JPanel getMessagesPanel() {
+        return this.messages;
+    }
+
+    // Remove all message from panel.
+    public void removeAllMessages() {
+        vertical.removeAll();
     }
 
     private void scrollToBottom(JScrollPane scrollPane) {
@@ -111,6 +198,10 @@ public class ChatArea extends JPanel {
 
     public JButton getBtnSend() {
         return this.btnSend;
+    }
+
+    public JLabel getAttachmentLabel() {
+        return this.attachmentLabel;
     }
 
     public String getMessageText() {

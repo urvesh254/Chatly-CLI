@@ -11,6 +11,9 @@ import java.net.UnknownHostException;
 
 import com.ukpatel.chatly.Message;
 
+/**
+ * @author Urveshkumar Patel
+ */
 public class Client implements Runnable {
 
 	private int PORT;
@@ -96,7 +99,17 @@ public class Client implements Runnable {
 			Message message;
 			while (true) {
 				message = (Message) reader.readObject();
-				System.out.println(message.getAuthor() + " : " + message.getMessage());
+				switch (message.getMessageType()) {
+				case Message.MESSAGE_RECEIVE:
+					System.out.println(message.getAuthor() + " : " + message.getMessage());
+					break;
+				case Message.FILE_INFO:
+					System.out.println(
+							String.format("%s sent the %s file.", message.getAuthor(), message.getFile().getName()));
+					break;
+				default:
+					break;
+				}
 			}
 		} catch (SocketException e) {
 			System.out.println("Server is closed.");
