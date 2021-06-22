@@ -146,7 +146,7 @@ public class MessagePanel extends JPanel {
 
         sendPanel.add(centerPanel, BorderLayout.CENTER);
 
-        // Bottom Pannel.
+        // Bottom Panel.
         JPanel bottomPanel = new JPanel(new BorderLayout());
         bottomPanel.setBackground(new Color(37, 211, 102));
 
