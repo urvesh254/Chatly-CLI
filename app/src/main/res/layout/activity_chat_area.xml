@@ -49,7 +49,7 @@
             android:scrollbars="vertical" />
 
         <Button
-            android:id="@+id/btnSend"
+            android:id="@+id/qrScan"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_gravity="right|center_vertical"

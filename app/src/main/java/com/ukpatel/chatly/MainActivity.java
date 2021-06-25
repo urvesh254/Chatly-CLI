@@ -1,13 +1,18 @@
 package com.ukpatel.chatly;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
@@ -25,7 +30,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -34,12 +42,14 @@ import java.net.UnknownHostException;
 import java.util.Formattable;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private static final int CAMERA_REQUEST_CODE = 101;
 
     private static String USER_NAME = Build.MODEL;
     private static String HOST_ADDRESS = "";
     private static int PORT = 54321;
 
     private Button btnConnect;
+    private ImageView qrScan;
     private EditText userName, hostName, port;
 
     @Override
@@ -54,6 +64,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         hostName = findViewById(R.id.hostName);
         port = findViewById(R.id.portNo);
         btnConnect = findViewById(R.id.btnConnect);
+        qrScan = findViewById(R.id.qrScan);
+        qrScan.setOnClickListener(view -> {
+            if (!isConnectedToWifi()) {
+                showConnectOption();
+                return;
+            }
+            if (userName.getText().toString().isEmpty()) {
+                showToast("Name should not be empty.");
+                return;
+            }
+            if (checkCameraPermission()) {
+                Intent intent = new Intent(MainActivity.this, ScanAndConnect.class);
+                intent.putExtra("wifiIP", getIP());
+                intent.putExtra("userName", userName.getText().toString());
+
+                startActivity(intent);
+                finish();
+            }
+        });
 
         // Set default Info.
         userName.setText(USER_NAME);
@@ -130,6 +159,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.d("wifi", ipAddress);
         return ipAddress;
 
+    }
+
+
+    private boolean checkCameraPermission() {
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        } else {
+            requestCameraPermissions();
+        }
+        return false;
+    }
+
+    private void requestCameraPermissions() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_REQUEST_CODE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull @NotNull String[] permissions, @NonNull @NotNull int[] grantResults) {
+        if (requestCode == CAMERA_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Intent intent = new Intent(MainActivity.this, ScanAndConnect.class);
+                intent.putExtra("wifiIP", getIP());
+                intent.putExtra("userName", userName.getText().toString());
+
+                startActivity(intent);
+                finish();
+            } else {
+                Toast.makeText(this, "Camera permission denied.", Toast.LENGTH_SHORT).show();
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @SuppressLint("SetTextI18n")

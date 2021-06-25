@@ -181,6 +181,8 @@ public class Client implements Runnable {
     }
 
     private void showToast(String msg) {
+        Looper.prepare();
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+        Looper.loop();
     }
 }
