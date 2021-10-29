@@ -1,14 +1,12 @@
 package com.ukpatel.chatly;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.budiyev.android.codescanner.CodeScanner;
 import com.budiyev.android.codescanner.CodeScannerView;
@@ -52,6 +50,7 @@ public class ScanAndConnect extends AppCompatActivity {
                         startActivity(new Intent(ScanAndConnect.this, ChatArea.class));
                         finish();
                     }
+                    Log.d("socket", "onDecoded: "+client.isSocketConnected());
                 } else {
                     runOnUiThread(() -> {
                         Toast.makeText(ScanAndConnect.this, "This QR code is not valid.", Toast.LENGTH_SHORT).show();

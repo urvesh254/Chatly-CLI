@@ -22,17 +22,15 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class Client implements Runnable {
 
-    private static Client client = null;
     private static final int connectionTimeout = 4000;
+    public static String clientName;
+    private static Client client = null;
     private boolean isConnected = false;
     private String HOST_NAME;
     private int PORT;
-    public static String clientName;
     private MessageAdapter messageAdapter;
     private RecyclerView recyclerView;
 
@@ -76,10 +74,6 @@ public class Client implements Runnable {
 
     }
 
-    public boolean isSocketConnected() {
-        return this.isConnected;
-    }
-
     public static Client getInstance() {
         return client;
     }
@@ -89,6 +83,10 @@ public class Client implements Runnable {
             client = new Client(context, ipAddress, username, hostName, port);
         }
         return client;
+    }
+
+    public boolean isSocketConnected() {
+        return this.isConnected;
     }
 
     public void setInfo(@NotNull AppCompatActivity context, @NotNull MessageAdapter history, @NotNull RecyclerView recyclerView) {
@@ -181,8 +179,6 @@ public class Client implements Runnable {
     }
 
     private void showToast(String msg) {
-        Looper.prepare();
-        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-        Looper.loop();
+        context.runOnUiThread(() -> Toast.makeText(context, msg, Toast.LENGTH_SHORT).show());
     }
 }

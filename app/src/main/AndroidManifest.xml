@@ -14,7 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/Theme.Chatly">
-        <activity android:name=".ScanAndConnect"></activity>
+        <activity android:name=".ScanAndConnect"/>
         <activity android:name=".ChatArea" />
         <activity android:name=".MainActivity">
             <intent-filter>
